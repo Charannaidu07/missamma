@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import MyOrders from "./pages/MyOrders.jsx"; 
+import StaffDashboard from "./pages/StaffDashboard.jsx"; 
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/staff" element={<StaffDashboard />} />
           </Routes>
         </div>
         <Footer />

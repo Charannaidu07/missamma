@@ -38,10 +38,9 @@ const MyOrders = () => {
 
   const openInvoice = (orderId) => {
   const token = localStorage.getItem("access");
-  const url = `https://missammabackend.onrender.com/api/payments/invoice/${orderId}/?token=${token}`;
+  const url = `http://127.0.0.1:8000/api/payments/invoice/${orderId}/?token=${token}`;
   window.open(url, "_blank");
 };
-
 
   const getStatusColor = (status) => {
     switch (status.toUpperCase()) {

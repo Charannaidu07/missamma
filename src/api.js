@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://missammabackend.onrender.com/api",
+  baseURL: "http://127.0.0.1:8000/api",
 });
 
 // Helper function to check if token is expired
@@ -57,7 +57,7 @@ api.interceptors.response.use(
         }
         
         console.log("🔄 Attempting token refresh...");
-        const response = await axios.post("https://missammabackend.onrender.com/api/accounts/token/refresh/", {
+        const response = await axios.post("http://127.0.0.1:8000/api/accounts/token/refresh/", {
           refresh: refreshToken
         });
         
