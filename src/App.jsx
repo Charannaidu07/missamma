@@ -17,8 +17,13 @@ import StaffDashboard from "./pages/StaffDashboard.jsx";
 function App() {
   return (
     <Router>
-      <div className="app-root">
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <Navbar />
+        <Header />
         <div style={{ flex: 1, padding: "1.5rem 6vw" }}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -33,7 +38,7 @@ function App() {
             <Route path="/staff" element={<StaffDashboard />} />
           </Routes>
         </div>
-        <Header />
+        <Footer />
       </div>
     </Router>
   );

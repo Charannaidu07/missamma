@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 const Cart = () => {
   const [cart, setCart] = useState([]);
+  const [hoveredItem, setHoveredItem] = useState(null);
 
   useEffect(() => {
     setCart(JSON.parse(localStorage.getItem("cart") || "[]"));
@@ -33,6 +34,27 @@ const Cart = () => {
     localStorage.setItem("cart", "[]");
   };
 
+  // Handle button hover effects
+  const handleButtonHover = (e) => {
+    e.target.style.transform = 'translateY(-2px)';
+    e.target.style.boxShadow = '0 6px 20px rgba(129, 199, 132, 0.4)';
+  };
+
+  const handleButtonLeave = (e) => {
+    e.target.style.transform = 'translateY(0)';
+    e.target.style.boxShadow = '0 4px 15px rgba(129, 199, 132, 0.3)';
+  };
+
+  const handleRemoveHover = (e) => {
+    e.target.style.background = 'linear-gradient(135deg, #feb2b2 0%, #fc8181 100%)';
+    e.target.style.transform = 'translateY(-1px)';
+  };
+
+  const handleRemoveLeave = (e) => {
+    e.target.style.background = 'linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%)';
+    e.target.style.transform = 'translateY(0)';
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
@@ -47,7 +69,12 @@ const Cart = () => {
             )}
           </div>
           {cart.length > 0 && (
-            <button onClick={clearCart} style={styles.clearButton}>
+            <button 
+              onClick={clearCart} 
+              style={styles.clearButton}
+              onMouseEnter={handleButtonHover}
+              onMouseLeave={handleButtonLeave}
+            >
               🗑️ Clear Cart
             </button>
           )}
@@ -58,9 +85,13 @@ const Cart = () => {
           <div style={styles.emptyState}>
             <div style={styles.emptyIcon}>🛒</div>
             <h3 style={styles.emptyTitle}>Your cart feels lonely</h3>
-            <p style={styles.emptyText}>Add some delicious items to get started!</p>
+            <p style={styles.emptyText}>Add some beautiful items to get started!</p>
             <Link to="/" style={{ textDecoration: 'none' }}>
-              <button style={styles.continueButton}>
+              <button 
+                style={styles.continueButton}
+                onMouseEnter={handleButtonHover}
+                onMouseLeave={handleButtonLeave}
+              >
                 🏠 Continue Shopping
               </button>
             </Link>
@@ -70,7 +101,15 @@ const Cart = () => {
             {/* Cart Items */}
             <div style={styles.itemsContainer}>
               {cart.map((item, idx) => (
-                <div key={idx} style={styles.cartItem}>
+                <div 
+                  key={idx} 
+                  style={{
+                    ...styles.cartItem,
+                    ...(hoveredItem === idx && styles.cartItemHover)
+                  }}
+                  onMouseEnter={() => setHoveredItem(idx)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                >
                   <div style={styles.itemInfo}>
                     <h4 style={styles.itemName}>{item.name}</h4>
                     <p style={styles.itemPrice}>₹ {item.price} each</p>
@@ -82,9 +121,21 @@ const Cart = () => {
                         onClick={() => updateQuantity(idx, item.quantity - 1)}
                         style={{
                           ...styles.quantityButton,
-                          ...(item.quantity <= 1 ? styles.disabledButton : {})
+                          ...(item.quantity <= 1 && styles.disabledButton)
                         }}
                         disabled={item.quantity <= 1}
+                        onMouseEnter={(e) => {
+                          if (item.quantity > 1) {
+                            e.target.style.background = '#81C784';
+                            e.target.style.color = 'white';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (item.quantity > 1) {
+                            e.target.style.background = 'white';
+                            e.target.style.color = '#81C784';
+                          }
+                        }}
                       >
                         −
                       </button>
@@ -92,6 +143,14 @@ const Cart = () => {
                       <button 
                         onClick={() => updateQuantity(idx, item.quantity + 1)}
                         style={styles.quantityButton}
+                        onMouseEnter={(e) => {
+                          e.target.style.background = '#81C784';
+                          e.target.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.background = 'white';
+                          e.target.style.color = '#81C784';
+                        }}
                       >
                         +
                       </button>
@@ -105,6 +164,8 @@ const Cart = () => {
                     <button 
                       onClick={() => removeItem(idx)}
                       style={styles.removeButton}
+                      onMouseEnter={handleRemoveHover}
+                      onMouseLeave={handleRemoveLeave}
                     >
                       🗑️ Remove
                     </button>
@@ -140,12 +201,28 @@ const Cart = () => {
               {/* Action Buttons */}
               <div style={styles.actionButtons}>
                 <Link to="/checkout" style={{ textDecoration: 'none', flex: 1 }}>
-                  <button style={styles.checkoutButton}>
+                  <button 
+                    style={styles.checkoutButton}
+                    onMouseEnter={handleButtonHover}
+                    onMouseLeave={handleButtonLeave}
+                  >
                     🚀 Proceed to Checkout
                   </button>
                 </Link>
                 <Link to="/" style={{ textDecoration: 'none', flex: 1 }}>
-                  <button style={styles.continueShoppingButton}>
+                  <button 
+                    style={styles.continueShoppingButton}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#81C784';
+                      e.target.style.color = 'white';
+                      e.target.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'white';
+                      e.target.style.color = '#81C784';
+                      e.target.style.transform = 'translateY(0)';
+                    }}
+                  >
                     ← Continue Shopping
                   </button>
                 </Link>
@@ -167,7 +244,7 @@ const Cart = () => {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #FF9A9E 0%, #FECFEF 50%, #FF9A9E 100%)',
     padding: '2rem 1rem',
     display: 'flex',
     justifyContent: 'center',
@@ -201,23 +278,23 @@ const styles = {
     color: '#2d3748',
     fontSize: '2rem',
     fontWeight: '800',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
   },
   itemCount: {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
     color: 'white',
     padding: '0.4rem 1rem',
     borderRadius: '25px',
     fontSize: '0.9rem',
     fontWeight: '600',
     alignSelf: 'flex-start',
-    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
   },
   clearButton: {
-    background: 'linear-gradient(135deg, #fc8181 0%, #f56565 100%)',
+    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
     color: 'white',
     border: 'none',
     padding: '0.7rem 1.5rem',
@@ -226,7 +303,7 @@ const styles = {
     fontWeight: '600',
     fontSize: '0.9rem',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(245, 101, 101, 0.3)',
+    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
   },
   emptyState: {
     textAlign: 'center',
@@ -237,6 +314,7 @@ const styles = {
     fontSize: '5rem',
     marginBottom: '1.5rem',
     opacity: 0.7,
+    color: '#81C784',
   },
   emptyTitle: {
     fontSize: '1.8rem',
@@ -250,7 +328,7 @@ const styles = {
     color: '#718096',
   },
   continueButton: {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
     color: 'white',
     border: 'none',
     padding: '1.2rem 2.5rem',
@@ -259,7 +337,7 @@ const styles = {
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
+    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
   },
   itemsContainer: {
     marginBottom: '2.5rem',
@@ -278,6 +356,11 @@ const styles = {
     background: 'white',
     transition: 'all 0.3s ease',
     boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+  },
+  cartItemHover: {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 8px 25px rgba(129, 199, 132, 0.15)',
+    borderColor: '#81C784',
   },
   itemInfo: {
     flex: 1,
@@ -325,14 +408,14 @@ const styles = {
     cursor: 'pointer',
     fontSize: '1.3rem',
     fontWeight: '600',
-    color: '#4a5568',
+    color: '#81C784',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     transition: 'all 0.2s ease',
   },
   disabledButton: {
     opacity: 0.4,
     cursor: 'not-allowed',
-    transform: 'none !important',
+    color: '#ccc',
   },
   quantityDisplay: {
     minWidth: '45px',
@@ -392,13 +475,13 @@ const styles = {
     color: '#4a5568',
   },
   shippingText: {
-    color: '#38a169',
+    color: '#81C784',
     fontWeight: '700',
     fontSize: '1rem',
   },
   divider: {
     height: '2px',
-    background: 'linear-gradient(90deg, transparent 0%, #cbd5e0 50%, transparent 100%)',
+    background: 'linear-gradient(90deg, transparent 0%, #81C784 50%, transparent 100%)',
     margin: '1.5rem 0',
   },
   grandTotal: {
@@ -415,7 +498,7 @@ const styles = {
   grandTotalAmount: {
     fontSize: '1.8rem',
     fontWeight: '800',
-    color: '#667eea',
+    color: '#81C784',
   },
   actionButtons: {
     display: 'flex',
@@ -425,7 +508,7 @@ const styles = {
   },
   checkoutButton: {
     flex: 1,
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
     color: 'white',
     border: 'none',
     padding: '1.5rem 2rem',
@@ -434,14 +517,14 @@ const styles = {
     fontWeight: '700',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.4)',
+    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
     minWidth: '250px',
   },
   continueShoppingButton: {
     flex: 1,
     background: 'white',
-    border: '3px solid #e2e8f0',
-    color: '#4a5568',
+    border: '3px solid #81C784',
+    color: '#81C784',
     padding: '1.5rem 2rem',
     borderRadius: '15px',
     fontSize: '1.1rem',
@@ -464,83 +547,10 @@ const styles = {
     fontSize: '1.2rem',
   },
   securityText: {
-    color: '#38a169',
+    color: '#81C784',
     fontWeight: '600',
     fontSize: '0.9rem',
   },
 };
-
-// Add hover effects
-const addHoverEffects = () => {
-  // Clear button hover
-  styles.clearButton = {
-    ...styles.clearButton,
-    ':hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 6px 20px rgba(245, 101, 101, 0.4)',
-    }
-  };
-
-  // Continue button hover
-  styles.continueButton = {
-    ...styles.continueButton,
-    ':hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: '0 10px 30px rgba(102, 126, 234, 0.6)',
-    }
-  };
-
-  // Quantity buttons hover
-  styles.quantityButton = {
-    ...styles.quantityButton,
-    ':hover': {
-      background: '#667eea',
-      color: 'white',
-      transform: 'scale(1.1)',
-    }
-  };
-
-  // Remove button hover
-  styles.removeButton = {
-    ...styles.removeButton,
-    ':hover': {
-      background: 'linear-gradient(135deg, #feb2b2 0%, #fc8181 100%)',
-      transform: 'translateY(-1px)',
-      boxShadow: '0 4px 12px rgba(245, 101, 101, 0.3)',
-    }
-  };
-
-  // Checkout button hover
-  styles.checkoutButton = {
-    ...styles.checkoutButton,
-    ':hover': {
-      transform: 'translateY(-3px)',
-      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.6)',
-    }
-  };
-
-  // Continue shopping button hover
-  styles.continueShoppingButton = {
-    ...styles.continueShoppingButton,
-    ':hover': {
-      background: '#f7fafc',
-      borderColor: '#667eea',
-      color: '#667eea',
-      transform: 'translateY(-2px)',
-    }
-  };
-
-  // Cart item hover
-  styles.cartItem = {
-    ...styles.cartItem,
-    ':hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
-      borderColor: '#667eea',
-    }
-  };
-};
-
-addHoverEffects();
 
 export default Cart;

@@ -34,18 +34,108 @@ const Footer = () => {
     e.target.style.boxShadow = 'none';
   };
 
-  // Handle legal link hover
-  const handleLegalHover = (e) => {
-    e.target.style.color = '#e84393';
+  // Handle Google Maps redirect with the provided share link
+  const handleOpenMaps = () => {
+    const mapsUrl = "https://maps.app.goo.gl/daGh3PYeU8cWZZ7k6";
+    window.open(mapsUrl, '_blank');
   };
 
-  const handleLegalLeave = (e) => {
-    e.target.style.color = '#bdc3c7';
+  // Handle Instagram redirect
+  const handleOpenInstagram = () => {
+    // Replace with your actual Instagram URL
+    const instagramUrl = "https://www.instagram.com/missamma_beautyparlour?igsh=MXUxOTI2NzBsMTM1dg==";
+    window.open(instagramUrl, '_blank');
   };
+
+  // Sample products data
+  const featuredProducts = [
+    {
+      id: 1,
+      name: "Gold Pearl Necklace",
+      price: "$199",
+      image: "💎",
+      category: "Jewelry"
+    },
+    {
+      id: 2,
+      name: "Bridal Makeup Package",
+      price: "$299",
+      image: "💄",
+      category: "Beauty"
+    },
+    {
+      id: 3,
+      name: "Diamond Earrings",
+      price: "$159",
+      image: "✨",
+      category: "Jewelry"
+    },
+    {
+      id: 4,
+      name: "Spa Day Package",
+      price: "$179",
+      image: "🛁",
+      category: "Wellness"
+    },
+    {
+      id: 5,
+      name: "Silver Bracelet Set",
+      price: "$129",
+      image: "📿",
+      category: "Jewelry"
+    },
+    {
+      id: 6,
+      name: "Hair Styling Session",
+      price: "$89",
+      image: "💇‍♀️",
+      category: "Beauty"
+    }
+  ];
 
   return (
     <footer style={styles.footer}>
       <div style={styles.container}>
+        {/* Banner Section - Replacing Newsletter */}
+        <div style={styles.bannerSection}>
+          <div style={styles.bannerHeader}>
+            <h4 style={styles.bannerTitle}>Featured Services & Products</h4>
+          </div>
+          
+          <div style={styles.bannerContainer}>
+            {/* Book Appointment Banner */}
+            <div style={styles.appointmentBanner}>
+              <div style={styles.appointmentContent}>
+                <h5 style={styles.appointmentTitle}>Book Your Appointment</h5>
+                <p style={styles.appointmentText}>
+                  Ready for a transformation? Book your beauty session today!
+                </p>
+                <Link to="/booking" style={styles.appointmentButton}>
+                  Book Now
+                </Link>
+              </div>
+              <div style={styles.appointmentIcon}>📅</div>
+            </div>
+
+            {/* Featured Products */}
+            {featuredProducts.map((product) => (
+              <div key={product.id} style={styles.productCard}>
+                <div style={styles.productImage}>
+                  {product.image}
+                </div>
+                <div style={styles.productInfo}>
+                  <span style={styles.productCategory}>{product.category}</span>
+                  <h6 style={styles.productName}>{product.name}</h6>
+                  <div style={styles.productPrice}>{product.price}</div>
+                  <Link to="/store" style={styles.viewProductButton}>
+                    View Product
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Main Footer Content */}
         <div style={styles.mainContent}>
           {/* Brand Section */}
@@ -72,6 +162,22 @@ const Footer = () => {
                 </a>
               ))}
             </div>
+            
+            {/* Instagram Button */}
+            <div style={styles.instagramSection}>
+              <button 
+                style={styles.instagramButton}
+                onClick={handleOpenInstagram}
+                onMouseEnter={handleButtonHover}
+                onMouseLeave={handleButtonLeave}
+              >
+                <span style={styles.instagramIcon}>📷</span>
+                Follow us on Instagram
+              </button>
+              <p style={styles.instagramText}>
+                Follow for beauty tips, new arrivals, and exclusive offers!
+              </p>
+            </div>
           </div>
 
           {/* Quick Links */}
@@ -81,8 +187,8 @@ const Footer = () => {
               {[
                 { name: 'Home', path: '/' },
                 { name: 'Beauty Services', path: '/services' },
-                { name: 'Jewelry Shop', path: '/jewelry' },
-                { name: 'Book Appointment', path: '/appointments' },
+                { name: 'Jewelry Shop', path: '/store' },
+                { name: 'Book Appointment', path: '/booking' },
                 { name: 'About Us', path: '/about' },
                 { name: 'Contact', path: '/contact' }
               ].map((link, index) => (
@@ -137,40 +243,32 @@ const Footer = () => {
             <h4 style={styles.sectionTitle}>Contact Info</h4>
             <div style={styles.contactInfo}>
               {[
-                { icon: '📍', text: '123 Beauty Street, City, State 12345' },
-                { icon: '📞', text: '+1 (555) 123-4567' },
-                { icon: '✉️', text: 'info@missamma.com' },
-                { icon: '🕒', text: 'Mon-Sat: 9AM-8PM, Sun: 10AM-6PM' }
+                { icon: '📍', text: 'Lalitha theatre, Near, beside hp gas, Peddapuram, Andhra Pradesh 533437' },
+                { icon: '📞', text: '+91 88979 78545' },
+                { icon: '✉️', text: 'missammabeautyparlour@gmail.com' },
+                { icon: '🕒', text: 'Mon-Sun: 9AM-8PM' }
               ].map((item, index) => (
                 <div key={index} style={styles.contactItem}>
                   <span style={styles.contactIcon}>{item.icon}</span>
                   <span style={styles.contactText}>{item.text}</span>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Newsletter Section */}
-        <div style={styles.newsletterSection}>
-          <div style={styles.newsletterContent}>
-            <h4 style={styles.newsletterTitle}>Stay Beautiful & Updated</h4>
-            <p style={styles.newsletterText}>
-              Subscribe to our newsletter for exclusive offers, beauty tips, and new jewelry collections.
-            </p>
-            <div style={styles.newsletterForm}>
-              <input 
-                type="email" 
-                placeholder="Enter your email address" 
-                style={styles.newsletterInput}
-              />
-              <button 
-                style={styles.newsletterButton}
-                onMouseEnter={handleButtonHover}
-                onMouseLeave={handleButtonLeave}
-              >
-                Subscribe
-              </button>
+              
+              {/* Google Maps Button */}
+              <div style={styles.mapsButtonContainer}>
+                <button 
+                  style={styles.mapsButton}
+                  onClick={handleOpenMaps}
+                  onMouseEnter={handleButtonHover}
+                  onMouseLeave={handleButtonLeave}
+                >
+                  <span style={styles.mapsIcon}>🗺️</span>
+                  Find Us on Google Maps
+                </button>
+                <p style={styles.mapsNote}>
+                  Click to open our location in Google Maps
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -192,8 +290,8 @@ const Footer = () => {
                   <Link 
                     to={legal.path}
                     style={styles.legalLink}
-                    onMouseEnter={handleLegalHover}
-                    onMouseLeave={handleLegalLeave}
+                    onMouseEnter={(e) => e.target.style.color = '#e84393'}
+                    onMouseLeave={(e) => e.target.style.color = '#bdc3c7'}
                   >
                     {legal.name}
                   </Link>
@@ -207,18 +305,208 @@ const Footer = () => {
   );
 };
 
-// Styles object with proper syntax
+// Styles
 const styles = {
   footer: {
     background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
     color: '#ecf0f1',
     marginTop: 'auto',
+    width: '100%',
   },
   container: {
     maxWidth: '1200px',
     margin: '0 auto',
     padding: '0 1rem',
   },
+  // Banner Section Styles
+  bannerSection: {
+    padding: '2.5rem 0',
+    borderBottom: '1px solid #4a6278',
+  },
+  bannerHeader: {
+    marginBottom: '1.5rem',
+    textAlign: 'center',
+  },
+  bannerTitle: {
+    fontSize: '1.5rem',
+    fontWeight: '600',
+    color: '#ecf0f1',
+    margin: 0,
+  },
+  bannerContainer: {
+    display: 'flex',
+    gap: '1.5rem',
+    overflowX: 'auto',
+    scrollBehavior: 'smooth',
+    padding: '1rem 0.5rem',
+    // Hide scrollbar for cleaner look
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+  },
+  'bannerContainer::-webkit-scrollbar': {
+    display: 'none',
+  },
+  // Appointment Banner
+  appointmentBanner: {
+    minWidth: '300px',
+    background: 'linear-gradient(135deg, #e84393 0%, #fd79a8 100%)',
+    borderRadius: '15px',
+    padding: '2rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    color: 'white',
+    flexShrink: 0,
+  },
+  appointmentContent: {
+    flex: 1,
+  },
+  appointmentTitle: {
+    fontSize: '1.3rem',
+    fontWeight: '600',
+    margin: '0 0 0.5rem 0',
+  },
+  appointmentText: {
+    fontSize: '0.9rem',
+    margin: '0 0 1rem 0',
+    opacity: 0.9,
+  },
+  appointmentButton: {
+    background: 'white',
+    color: '#e84393',
+    padding: '0.7rem 1.5rem',
+    borderRadius: '25px',
+    textDecoration: 'none',
+    fontWeight: '600',
+    fontSize: '0.9rem',
+    display: 'inline-block',
+    transition: 'all 0.3s ease',
+  },
+  appointmentIcon: {
+    fontSize: '3rem',
+    marginLeft: '1rem',
+  },
+  // Product Card
+  productCard: {
+    minWidth: '250px',
+    background: '#34495e',
+    borderRadius: '12px',
+    padding: '1.5rem',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+    transition: 'all 0.3s ease',
+    flexShrink: 0,
+  },
+  productImage: {
+    fontSize: '3rem',
+    marginBottom: '1rem',
+  },
+  productInfo: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.5rem',
+  },
+  productCategory: {
+    fontSize: '0.8rem',
+    color: '#e84393',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+  },
+  productName: {
+    fontSize: '1rem',
+    fontWeight: '600',
+    margin: '0.5rem 0',
+    color: '#ecf0f1',
+  },
+  productPrice: {
+    fontSize: '1.1rem',
+    fontWeight: '700',
+    color: '#e84393',
+    margin: '0.5rem 0',
+  },
+  viewProductButton: {
+    background: 'transparent',
+    color: '#bdc3c7',
+    border: '1px solid #4a6278',
+    padding: '0.5rem 1rem',
+    borderRadius: '20px',
+    textDecoration: 'none',
+    fontSize: '0.8rem',
+    transition: 'all 0.3s ease',
+    marginTop: 'auto',
+  },
+  // Instagram Button Styles
+  instagramSection: {
+    marginTop: '1.5rem',
+    paddingTop: '1.5rem',
+    borderTop: '1px solid #4a6278',
+  },
+  instagramButton: {
+    background: 'linear-gradient(45deg, #405DE6, #833AB4, #E1306C, #F56040, #FCAF45)',
+    color: 'white',
+    border: 'none',
+    padding: '0.8rem 1.5rem',
+    borderRadius: '25px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '0.9rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    justifyContent: 'center',
+    boxShadow: '0 4px 15px rgba(225, 48, 108, 0.3)',
+    marginBottom: '0.5rem',
+  },
+  instagramIcon: {
+    fontSize: '1.2rem',
+  },
+  instagramText: {
+    fontSize: '0.75rem',
+    color: '#95a5a6',
+    margin: 0,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  // Google Maps Button Styles
+  mapsButtonContainer: {
+    marginTop: '1rem',
+    paddingTop: '1rem',
+    borderTop: '1px solid #4a6278',
+    textAlign: 'center',
+  },
+  mapsButton: {
+    background: 'linear-gradient(135deg, #e84393 0%, #fd79a8 100%)',
+    color: 'white',
+    border: 'none',
+    padding: '0.8rem 1.5rem',
+    borderRadius: '25px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '0.9rem',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    justifyContent: 'center',
+    boxShadow: '0 4px 15px rgba(232, 67, 147, 0.3)',
+    marginBottom: '0.5rem',
+  },
+  mapsIcon: {
+    fontSize: '1.2rem',
+  },
+  mapsNote: {
+    fontSize: '0.75rem',
+    color: '#95a5a6',
+    margin: 0,
+    fontStyle: 'italic',
+  },
+  // Rest of the styles remain the same
   mainContent: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
@@ -313,53 +601,6 @@ const styles = {
   },
   contactText: {
     color: '#bdc3c7',
-  },
-  newsletterSection: {
-    padding: '2.5rem 0',
-    borderBottom: '1px solid #4a6278',
-  },
-  newsletterContent: {
-    textAlign: 'center',
-    maxWidth: '500px',
-    margin: '0 auto',
-  },
-  newsletterTitle: {
-    fontSize: '1.5rem',
-    fontWeight: '600',
-    marginBottom: '1rem',
-    color: '#ecf0f1',
-  },
-  newsletterText: {
-    color: '#bdc3c7',
-    marginBottom: '1.5rem',
-    lineHeight: '1.6',
-  },
-  newsletterForm: {
-    display: 'flex',
-    gap: '0.5rem',
-    maxWidth: '400px',
-    margin: '0 auto',
-  },
-  newsletterInput: {
-    flex: 1,
-    padding: '0.8rem 1rem',
-    border: 'none',
-    borderRadius: '25px',
-    fontSize: '0.9rem',
-    background: '#34495e',
-    color: '#ecf0f1',
-    outline: 'none',
-  },
-  newsletterButton: {
-    padding: '0.8rem 1.5rem',
-    border: 'none',
-    borderRadius: '25px',
-    background: 'linear-gradient(135deg, #e84393 0%, #fd79a8 100%)',
-    color: 'white',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    fontSize: '0.9rem',
   },
   bottomBar: {
     padding: '1.5rem 0',

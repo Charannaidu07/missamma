@@ -74,7 +74,7 @@ const Store = () => {
             key={p.id}
             style={{
               padding: "1rem",
-              background: "#81C784",
+              background: "#7ae19ef6",
               borderRadius: "15px",
               boxShadow: "0 6px 15px rgba(0,0,0,0.1)",
               textAlign: "center",
@@ -106,9 +106,9 @@ const Store = () => {
                 onClick={() => decrease(p)}
                 style={{
                   border: "none",
-                  background: "#00cc66",
+                  background: "#e182d1ff",
 
-                  color: "white",
+                  color: "green",
                   width: "32px",
                   height: "32px",
                   borderRadius: "50%",
@@ -126,7 +126,7 @@ const Store = () => {
                 onClick={() => increase(p)}
                 style={{
                   border: "none",
-                  background: "#00cc66",
+                  background: "#e182d1ff",
                   color: "white",
                   width: "32px",
                   height: "32px",
@@ -144,7 +144,7 @@ const Store = () => {
               style={{
                 marginTop: "12px",
                 padding: "8px 12px",
-                background: "#00cc66",
+                background: "#e182d1ff",
                 color: "white",
                 border: "none",
                 borderRadius: "8px",
@@ -153,8 +153,8 @@ const Store = () => {
                 fontWeight: "bold",
                 transition: "background 0.2s"
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "#00994d"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "#00cc66"}
+              onMouseEnter={(e) => e.currentTarget.style.background = "#82e187ff"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "#82e187ff"}
             >
               View Details
             </button>
@@ -181,7 +181,7 @@ const Store = () => {
         >
           <div
             style={{
-              background: "#ffe6f0",
+              background: "#82e187ff",
               padding: "2rem",
               borderRadius: "10px",
               maxWidth: "400px",
