@@ -36,12 +36,17 @@ const MyOrders = () => {
     fetchOrders();
   }, [navigate]);
 
-  const openInvoice = (orderId) => {
+//   const openInvoice = (orderId) => {
+//   const token = localStorage.getItem("access");
+//   const url = `https://missammabackend.onrender.com/api/payments/invoice/${orderId}/?token=${token}`;
+//   window.open(url, "_blank");
+// };
+const openInvoice = (orderId) => {
   const token = localStorage.getItem("access");
+  // Use the correct URL pattern from your urls.py
   const url = `https://missammabackend.onrender.com/api/payments/invoice/${orderId}/?token=${token}`;
   window.open(url, "_blank");
 };
-
   const getStatusColor = (status) => {
     switch (status.toUpperCase()) {
       case "PAID":

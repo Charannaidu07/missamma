@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Header from "./components/Header.jsx";
-// import Footer from "./components/Footer.jsx";
+import Footer from './components/Footer';
 import Home from "./pages/Home.jsx";
 import Services from "./pages/Services.jsx";
 import Booking from "./pages/Booking.jsx";
@@ -35,6 +35,7 @@ function App() {
         </div>
         <Header />
       </div>
+      <Footer />
     </Router>
   );
 }
