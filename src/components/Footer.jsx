@@ -52,42 +52,42 @@ const Footer = () => {
     {
       id: 1,
       name: "Gold Pearl Necklace",
-      price: "$199",
+      price: "₹199",
       image: "💎",
       category: "Jewelry"
     },
     {
       id: 2,
       name: "Bridal Makeup Package",
-      price: "$299",
+      price: "₹299",
       image: "💄",
       category: "Beauty"
     },
     {
       id: 3,
       name: "Diamond Earrings",
-      price: "$159",
+      price: "₹159",
       image: "✨",
       category: "Jewelry"
     },
     {
       id: 4,
       name: "Spa Day Package",
-      price: "$179",
+      price: "₹179",
       image: "🛁",
       category: "Wellness"
     },
     {
       id: 5,
       name: "Silver Bracelet Set",
-      price: "$129",
+      price: "₹129",
       image: "📿",
       category: "Jewelry"
     },
     {
       id: 6,
       name: "Hair Styling Session",
-      price: "$89",
+      price: "₹89",
       image: "💇‍♀️",
       category: "Beauty"
     }
@@ -99,7 +99,7 @@ const Footer = () => {
         {/* Banner Section - Replacing Newsletter */}
         <div style={styles.bannerSection}>
           <div style={styles.bannerHeader}>
-            <h4 style={styles.bannerTitle}>Featured Services & Products</h4>
+            <h4 style={styles.bannerTitle}></h4>
           </div>
           
           <div style={styles.bannerContainer}>
@@ -140,28 +140,13 @@ const Footer = () => {
         <div style={styles.mainContent}>
           {/* Brand Section */}
           <div style={styles.brandSection}>
-            <h3 style={styles.brandTitle}>Miss Amma</h3>
+            <h3 style={styles.brandTitle}>Missamma</h3>
             <p style={styles.brandDescription}>
               Your one-stop destination for premium beauty services, exquisite jewelry, 
               and professional beauty consultations. Experience the perfect blend of 
               elegance and wellness.
             </p>
-            <div style={styles.socialLinks}>
-              {['📘', '📷', '🐦', '💼'].map((icon, index) => (
-                <a 
-                  key={index}
-                  href="#" 
-                  style={{
-                    ...styles.socialLink,
-                    ...(hoveredSocial === index && styles.socialLinkHover)
-                  }}
-                  onMouseEnter={() => handleSocialHover(index)}
-                  onMouseLeave={handleSocialLeave}
-                >
-                  {icon}
-                </a>
-              ))}
-            </div>
+        
             
             {/* Instagram Button */}
             <div style={styles.instagramSection}>
@@ -187,10 +172,10 @@ const Footer = () => {
               {[
                 { name: 'Home', path: '/' },
                 { name: 'Beauty Services', path: '/services' },
-                { name: 'Jewelry Shop', path: '/store' },
+                { name: 'Jewelry Store', path: '/store' },
                 { name: 'Book Appointment', path: '/booking' },
                 { name: 'About Us', path: '/about' },
-                { name: 'Contact', path: '/contact' }
+                { name: 'Contact Us', path: '/contact' }
               ].map((link, index) => (
                 <li key={index} style={styles.listItem}>
                   <Link 
@@ -246,7 +231,7 @@ const Footer = () => {
                 { icon: '📍', text: 'Lalitha theatre, Near, beside hp gas, Peddapuram, Andhra Pradesh 533437' },
                 { icon: '📞', text: '+91 88979 78545' },
                 { icon: '✉️', text: 'missammabeautyparlour@gmail.com' },
-                { icon: '🕒', text: 'Mon-Sun: 9AM-8PM' }
+                { icon: '🕒', text: 'Mon-Sun: 9AM-10PM' }
               ].map((item, index) => (
                 <div key={index} style={styles.contactItem}>
                   <span style={styles.contactIcon}>{item.icon}</span>
@@ -277,7 +262,7 @@ const Footer = () => {
         <div style={styles.bottomBar}>
           <div style={styles.bottomContent}>
             <div style={styles.copyright}>
-              © {new Date().getFullYear()} Miss Amma Beauty & Jewelry. All rights reserved.
+              © {new Date().getFullYear()} Missamma Beauty & Jewelry. All rights reserved.
             </div>
             <div style={styles.legalLinks}>
               {[

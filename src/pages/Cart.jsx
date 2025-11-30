@@ -34,37 +34,21 @@ const Cart = () => {
     localStorage.setItem("cart", "[]");
   };
 
-  // Handle button hover effects
-  const handleButtonHover = (e) => {
-    e.target.style.transform = 'translateY(-2px)';
-    e.target.style.boxShadow = '0 6px 20px rgba(129, 199, 132, 0.4)';
-  };
-
-  const handleButtonLeave = (e) => {
-    e.target.style.transform = 'translateY(0)';
-    e.target.style.boxShadow = '0 4px 15px rgba(129, 199, 132, 0.3)';
-  };
-
-  const handleRemoveHover = (e) => {
-    e.target.style.background = 'linear-gradient(135deg, #feb2b2 0%, #fc8181 100%)';
-    e.target.style.transform = 'translateY(-1px)';
-  };
-
-  const handleRemoveLeave = (e) => {
-    e.target.style.background = 'linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%)';
-    e.target.style.transform = 'translateY(0)';
-  };
-
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         {/* Header Section */}
         <div style={styles.header}>
           <div style={styles.titleSection}>
-            <h1 style={styles.title}>🛒 Your Shopping Cart</h1>
+            <span className="badge-soft" style={styles.badge}>
+              Your Shopping Cart
+            </span>
+            <h1 style={styles.title}>
+              🛒 Shopping Cart
+            </h1>
             {totalItems > 0 && (
               <span style={styles.itemCount}>
-                {totalItems} item{totalItems !== 1 ? 's' : ''}
+                {totalItems} item{totalItems !== 1 ? 's' : ''} in cart
               </span>
             )}
           </div>
@@ -72,8 +56,14 @@ const Cart = () => {
             <button 
               onClick={clearCart} 
               style={styles.clearButton}
-              onMouseEnter={handleButtonHover}
-              onMouseLeave={handleButtonLeave}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(232, 67, 147, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 15px rgba(232, 67, 147, 0.3)';
+              }}
             >
               🗑️ Clear Cart
             </button>
@@ -84,17 +74,42 @@ const Cart = () => {
         {cart.length === 0 ? (
           <div style={styles.emptyState}>
             <div style={styles.emptyIcon}>🛒</div>
-            <h3 style={styles.emptyTitle}>Your cart feels lonely</h3>
-            <p style={styles.emptyText}>Add some beautiful items to get started!</p>
-            <Link to="/" style={{ textDecoration: 'none' }}>
-              <button 
-                style={styles.continueButton}
-                onMouseEnter={handleButtonHover}
-                onMouseLeave={handleButtonLeave}
-              >
-                🏠 Continue Shopping
-              </button>
-            </Link>
+            <h3 style={styles.emptyTitle}>Your cart is empty</h3>
+            <p style={styles.emptyText}>
+              Discover our beautiful jewelry collection and premium beauty services
+            </p>
+            <div style={styles.emptyButtons}>
+              <Link to="/store" style={{ textDecoration: 'none' }}>
+                <button 
+                  style={styles.primaryButton}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 8px 25px rgba(255, 215, 0, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3)';
+                  }}
+                >
+                  💎 Shop Jewelry
+                </button>
+              </Link>
+              <Link to="/services" style={{ textDecoration: 'none' }}>
+                <button 
+                  style={styles.secondaryButton}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 8px 25px rgba(232, 67, 147, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 15px rgba(232, 67, 147, 0.3)';
+                  }}
+                >
+                  💄 Book Services
+                </button>
+              </Link>
+            </div>
           </div>
         ) : (
           <>
@@ -110,9 +125,23 @@ const Cart = () => {
                   onMouseEnter={() => setHoveredItem(idx)}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
+                  <div style={styles.itemImage}>
+                    <div style={styles.imagePlaceholder}>
+                      {item.category === 'jewelry' ? '💎' : '💄'}
+                    </div>
+                  </div>
+                  
                   <div style={styles.itemInfo}>
                     <h4 style={styles.itemName}>{item.name}</h4>
-                    <p style={styles.itemPrice}>₹ {item.price} each</p>
+                    <p style={styles.itemDescription}>
+                      {item.description || 'Premium quality product'}
+                    </p>
+                    <div style={styles.itemMeta}>
+                      <span style={styles.itemCategory}>
+                        {item.category === 'jewelry' ? 'Jewelry' : 'Beauty Service'}
+                      </span>
+                      <span style={styles.itemPrice}>₹{item.price} each</span>
+                    </div>
                   </div>
                   
                   <div style={styles.quantitySection}>
@@ -124,18 +153,6 @@ const Cart = () => {
                           ...(item.quantity <= 1 && styles.disabledButton)
                         }}
                         disabled={item.quantity <= 1}
-                        onMouseEnter={(e) => {
-                          if (item.quantity > 1) {
-                            e.target.style.background = '#81C784';
-                            e.target.style.color = 'white';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (item.quantity > 1) {
-                            e.target.style.background = 'white';
-                            e.target.style.color = '#81C784';
-                          }
-                        }}
                       >
                         −
                       </button>
@@ -143,14 +160,6 @@ const Cart = () => {
                       <button 
                         onClick={() => updateQuantity(idx, item.quantity + 1)}
                         style={styles.quantityButton}
-                        onMouseEnter={(e) => {
-                          e.target.style.background = '#81C784';
-                          e.target.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.background = 'white';
-                          e.target.style.color = '#81C784';
-                        }}
                       >
                         +
                       </button>
@@ -164,10 +173,16 @@ const Cart = () => {
                     <button 
                       onClick={() => removeItem(idx)}
                       style={styles.removeButton}
-                      onMouseEnter={handleRemoveHover}
-                      onMouseLeave={handleRemoveLeave}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = 'linear-gradient(135deg, #e84393, #fd79a8)';
+                        e.target.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = 'transparent';
+                        e.target.style.transform = 'translateY(0)';
+                      }}
                     >
-                      🗑️ Remove
+                      Remove
                     </button>
                   </div>
                 </div>
@@ -177,16 +192,17 @@ const Cart = () => {
             {/* Order Summary */}
             <div style={styles.footer}>
               <div style={styles.totalSection}>
+                <h3 style={styles.summaryTitle}>Order Summary</h3>
                 <div style={styles.totalRow}>
-                  <span style={styles.totalLabel}>Subtotal</span>
+                  <span style={styles.totalLabel}>Subtotal ({totalItems} items)</span>
                   <span style={styles.totalAmount}>₹ {total.toFixed(2)}</span>
                 </div>
                 <div style={styles.totalRow}>
                   <span style={styles.totalLabel}>Shipping</span>
-                  <span style={styles.shippingText}>FREE</span>
+                  <span style={styles.shippingText}>FREE 🎉</span>
                 </div>
                 <div style={styles.totalRow}>
-                  <span style={styles.totalLabel}>Tax</span>
+                  <span style={styles.totalLabel}>Tax (18%)</span>
                   <span style={styles.totalAmount}>₹ {(total * 0.18).toFixed(2)}</span>
                 </div>
                 <div style={styles.divider}></div>
@@ -203,23 +219,29 @@ const Cart = () => {
                 <Link to="/checkout" style={{ textDecoration: 'none', flex: 1 }}>
                   <button 
                     style={styles.checkoutButton}
-                    onMouseEnter={handleButtonHover}
-                    onMouseLeave={handleButtonLeave}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(232, 67, 147, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 15px rgba(232, 67, 147, 0.3)';
+                    }}
                   >
                     🚀 Proceed to Checkout
                   </button>
                 </Link>
-                <Link to="/" style={{ textDecoration: 'none', flex: 1 }}>
+                <Link to="/store" style={{ textDecoration: 'none', flex: 1 }}>
                   <button 
                     style={styles.continueShoppingButton}
                     onMouseEnter={(e) => {
-                      e.target.style.background = '#81C784';
+                      e.target.style.background = '#e84393';
                       e.target.style.color = 'white';
                       e.target.style.transform = 'translateY(-2px)';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.background = 'white';
-                      e.target.style.color = '#81C784';
+                      e.target.style.background = 'transparent';
+                      e.target.style.color = '#e84393';
                       e.target.style.transform = 'translateY(0)';
                     }}
                   >
@@ -228,10 +250,20 @@ const Cart = () => {
                 </Link>
               </div>
 
-              {/* Security Badge */}
-              <div style={styles.securityBadge}>
-                <div style={styles.securityIcon}>🔒</div>
-                <span style={styles.securityText}>Secure & Encrypted Checkout</span>
+              {/* Security & Benefits */}
+              <div style={styles.benefitsSection}>
+                <div style={styles.benefitItem}>
+                  <span style={styles.benefitIcon}>🔒</span>
+                  <span style={styles.benefitText}>Secure & Encrypted Checkout</span>
+                </div>
+                <div style={styles.benefitItem}>
+                  <span style={styles.benefitIcon}>🚚</span>
+                  <span style={styles.benefitText}>Free Shipping & Returns</span>
+                </div>
+                <div style={styles.benefitItem}>
+                  <span style={styles.benefitIcon}>💎</span>
+                  <span style={styles.benefitText}>Premium Quality Guarantee</span>
+                </div>
               </div>
             </div>
           </>
@@ -244,7 +276,7 @@ const Cart = () => {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #FF9A9E 0%, #FECFEF 50%, #FF9A9E 100%)',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     padding: '2rem 1rem',
     display: 'flex',
     justifyContent: 'center',
@@ -252,12 +284,12 @@ const styles = {
   },
   card: {
     background: 'white',
-    borderRadius: '20px',
+    borderRadius: '25px',
     padding: '2.5rem',
     boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
     width: '100%',
-    maxWidth: '800px',
-    minHeight: '500px',
+    maxWidth: '900px',
+    minHeight: '600px',
     border: '1px solid rgba(255,255,255,0.2)',
   },
   header: {
@@ -268,6 +300,16 @@ const styles = {
     borderBottom: '2px solid #f8f9fa',
     paddingBottom: '1.5rem',
   },
+  badge: {
+    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
+    color: 'white',
+    padding: '0.4rem 1rem',
+    borderRadius: '20px',
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    marginBottom: '0.5rem',
+    display: 'inline-block',
+  },
   titleSection: {
     display: 'flex',
     flexDirection: 'column',
@@ -275,83 +317,104 @@ const styles = {
   },
   title: {
     margin: 0,
-    color: '#2d3748',
-    fontSize: '2rem',
+    color: '#2c3e50',
+    fontSize: '2.2rem',
     fontWeight: '800',
-    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
+    background: 'linear-gradient(135deg, #e84393 0%, #fd79a8 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
   },
   itemCount: {
-    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
-    color: 'white',
-    padding: '0.4rem 1rem',
-    borderRadius: '25px',
-    fontSize: '0.9rem',
-    fontWeight: '600',
-    alignSelf: 'flex-start',
-    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
+    color: '#7f8c8d',
+    fontSize: '1rem',
+    fontWeight: '500',
   },
   clearButton: {
-    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
+    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
     color: 'white',
     border: 'none',
-    padding: '0.7rem 1.5rem',
+    padding: '0.8rem 1.5rem',
     borderRadius: '12px',
     cursor: 'pointer',
     fontWeight: '600',
     fontSize: '0.9rem',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
+    boxShadow: '0 4px 15px rgba(232, 67, 147, 0.3)',
   },
   emptyState: {
     textAlign: 'center',
     padding: '4rem 2rem',
-    color: '#718096',
+    color: '#7f8c8d',
   },
   emptyIcon: {
-    fontSize: '5rem',
+    fontSize: '6rem',
     marginBottom: '1.5rem',
     opacity: 0.7,
-    color: '#81C784',
   },
   emptyTitle: {
-    fontSize: '1.8rem',
+    fontSize: '2rem',
     fontWeight: '700',
     margin: '0 0 1rem 0',
-    color: '#4a5568',
+    color: '#2c3e50',
+    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
   },
   emptyText: {
     margin: '0 0 2.5rem 0',
     fontSize: '1.1rem',
-    color: '#718096',
+    color: '#7f8c8d',
+    maxWidth: '400px',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    lineHeight: '1.6',
   },
-  continueButton: {
-    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
+  emptyButtons: {
+    display: 'flex',
+    gap: '1rem',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+  },
+  primaryButton: {
+    background: 'linear-gradient(135deg, #FFD700, #FFA500)',
     color: 'white',
     border: 'none',
-    padding: '1.2rem 2.5rem',
+    padding: '1.2rem 2rem',
     borderRadius: '50px',
     fontSize: '1.1rem',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
+    boxShadow: '0 4px 15px rgba(255, 215, 0, 0.3)',
+  },
+  secondaryButton: {
+    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
+    color: 'white',
+    border: 'none',
+    padding: '1.2rem 2rem',
+    borderRadius: '50px',
+    fontSize: '1.1rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    boxShadow: '0 4px 15px rgba(232, 67, 147, 0.3)',
   },
   itemsContainer: {
     marginBottom: '2.5rem',
-    maxHeight: '400px',
+    maxHeight: '500px',
     overflowY: 'auto',
     paddingRight: '0.5rem',
   },
   cartItem: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: '80px 1fr auto auto',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: '1.5rem',
     padding: '1.5rem',
     border: '2px solid #f7fafc',
-    borderRadius: '15px',
+    borderRadius: '20px',
     marginBottom: '1rem',
     background: 'white',
     transition: 'all 0.3s ease',
@@ -359,26 +422,59 @@ const styles = {
   },
   cartItemHover: {
     transform: 'translateY(-2px)',
-    boxShadow: '0 8px 25px rgba(129, 199, 132, 0.15)',
-    borderColor: '#81C784',
+    boxShadow: '0 8px 25px rgba(232, 67, 147, 0.15)',
+    borderColor: '#e84393',
+  },
+  itemImage: {
+    width: '80px',
+    height: '80px',
+    borderRadius: '15px',
+    overflow: 'hidden',
+  },
+  imagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    background: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '2rem',
+    borderRadius: '15px',
   },
   itemInfo: {
-    flex: 1,
     minWidth: 0,
   },
   itemName: {
     margin: '0 0 0.5rem 0',
-    fontSize: '1.2rem',
+    fontSize: '1.3rem',
     fontWeight: '700',
-    color: '#2d3748',
+    color: '#2c3e50',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
+  itemDescription: {
+    margin: '0 0 0.5rem 0',
+    fontSize: '0.9rem',
+    color: '#7f8c8d',
+    lineHeight: '1.4',
+  },
+  itemMeta: {
+    display: 'flex',
+    gap: '1rem',
+    alignItems: 'center',
+  },
+  itemCategory: {
+    background: '#f8f9fa',
+    padding: '0.3rem 0.8rem',
+    borderRadius: '12px',
+    fontSize: '0.8rem',
+    fontWeight: '600',
+    color: '#e84393',
+  },
   itemPrice: {
-    margin: 0,
     fontSize: '1rem',
-    color: '#718096',
+    color: '#7f8c8d',
     fontWeight: '500',
   },
   quantitySection: {
@@ -386,15 +482,14 @@ const styles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '0.5rem',
-    margin: '0 1.5rem',
   },
   quantityControls: {
     display: 'flex',
     alignItems: 'center',
-    background: '#f7fafc',
+    background: '#f8f9fa',
     borderRadius: '15px',
     padding: '0.4rem',
-    border: '2px solid #e2e8f0',
+    border: '2px solid #e9ecef',
   },
   quantityButton: {
     background: 'white',
@@ -408,7 +503,7 @@ const styles = {
     cursor: 'pointer',
     fontSize: '1.3rem',
     fontWeight: '600',
-    color: '#81C784',
+    color: '#e84393',
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     transition: 'all 0.2s ease',
   },
@@ -422,7 +517,7 @@ const styles = {
     textAlign: 'center',
     fontWeight: '700',
     fontSize: '1.1rem',
-    color: '#2d3748',
+    color: '#2c3e50',
   },
   itemTotal: {
     display: 'flex',
@@ -432,14 +527,14 @@ const styles = {
     minWidth: '120px',
   },
   totalPrice: {
-    fontSize: '1.3rem',
+    fontSize: '1.4rem',
     fontWeight: '800',
-    color: '#2d3748',
+    color: '#2c3e50',
   },
   removeButton: {
-    background: 'linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%)',
-    border: 'none',
-    color: '#c53030',
+    background: 'transparent',
+    border: '2px solid #e84393',
+    color: '#e84393',
     padding: '0.5rem 1rem',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -452,11 +547,18 @@ const styles = {
     paddingTop: '2.5rem',
   },
   totalSection: {
-    background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+    background: 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
     padding: '2rem',
-    borderRadius: '15px',
+    borderRadius: '20px',
     marginBottom: '2rem',
     border: '2px solid #e9ecef',
+  },
+  summaryTitle: {
+    margin: '0 0 1.5rem 0',
+    fontSize: '1.5rem',
+    fontWeight: '700',
+    color: '#2c3e50',
+    textAlign: 'center',
   },
   totalRow: {
     display: 'flex',
@@ -466,22 +568,22 @@ const styles = {
     fontSize: '1.1rem',
   },
   totalLabel: {
-    color: '#718096',
+    color: '#7f8c8d',
     fontSize: '1rem',
     fontWeight: '500',
   },
   totalAmount: {
     fontWeight: '600',
-    color: '#4a5568',
+    color: '#2c3e50',
   },
   shippingText: {
-    color: '#81C784',
+    color: '#e84393',
     fontWeight: '700',
     fontSize: '1rem',
   },
   divider: {
     height: '2px',
-    background: 'linear-gradient(90deg, transparent 0%, #81C784 50%, transparent 100%)',
+    background: 'linear-gradient(90deg, transparent 0%, #e84393 50%, transparent 100%)',
     margin: '1.5rem 0',
   },
   grandTotal: {
@@ -493,22 +595,22 @@ const styles = {
   grandTotalLabel: {
     fontSize: '1.3rem',
     fontWeight: '700',
-    color: '#2d3748',
+    color: '#2c3e50',
   },
   grandTotalAmount: {
     fontSize: '1.8rem',
     fontWeight: '800',
-    color: '#81C784',
+    color: '#e84393',
   },
   actionButtons: {
     display: 'flex',
     gap: '1rem',
-    marginBottom: '1.5rem',
+    marginBottom: '2rem',
     flexWrap: 'wrap',
   },
   checkoutButton: {
     flex: 1,
-    background: 'linear-gradient(135deg, #81C784 0%, #66BB6A 100%)',
+    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
     color: 'white',
     border: 'none',
     padding: '1.5rem 2rem',
@@ -517,14 +619,14 @@ const styles = {
     fontWeight: '700',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(129, 199, 132, 0.3)',
+    boxShadow: '0 4px 15px rgba(232, 67, 147, 0.3)',
     minWidth: '250px',
   },
   continueShoppingButton: {
     flex: 1,
-    background: 'white',
-    border: '3px solid #81C784',
-    color: '#81C784',
+    background: 'transparent',
+    border: '3px solid #e84393',
+    color: '#e84393',
     padding: '1.5rem 2rem',
     borderRadius: '15px',
     fontSize: '1.1rem',
@@ -533,23 +635,27 @@ const styles = {
     transition: 'all 0.3s ease',
     minWidth: '250px',
   },
-  securityBadge: {
+  benefitsSection: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+    gap: '1rem',
+    padding: '1.5rem',
+    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    borderRadius: '15px',
+    color: 'white',
+  },
+  benefitItem: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.5rem',
-    padding: '1rem',
-    background: '#f0fff4',
-    borderRadius: '10px',
-    border: '2px solid #c6f6d5',
+    gap: '0.8rem',
+    fontSize: '0.9rem',
+    fontWeight: '500',
   },
-  securityIcon: {
+  benefitIcon: {
     fontSize: '1.2rem',
   },
-  securityText: {
-    color: '#81C784',
-    fontWeight: '600',
-    fontSize: '0.9rem',
+  benefitText: {
+    opacity: 0.9,
   },
 };
 
