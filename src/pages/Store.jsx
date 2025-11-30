@@ -9,7 +9,6 @@ const Store = () => {
   const [quantities, setQuantities] = useState({});
   const [openDetailsId, setOpenDetailsId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [layout, setLayout] = useState("carousel"); // carousel, sideBySide, grid
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -18,7 +17,6 @@ const Store = () => {
         const response = await api.get("/store/products/");
         setProducts(response.data);
 
-        // Load quantities from localStorage
         const cart = JSON.parse(localStorage.getItem("cart") || "[]");
         let q = {};
         cart.forEach((item) => {
@@ -35,7 +33,6 @@ const Store = () => {
     fetchProducts();
   }, []);
 
-  // Placeholder SVG
   const getPlaceholderSvg = (productName = "Product") => {
     return `data:image/svg+xml;base64,${btoa(`
       <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
@@ -46,11 +43,7 @@ const Store = () => {
     `)}`;
   };
 
-  const getImageUrl = (product, index = 0) => {
-    if (product.images && product.images.length > index) {
-      const imgUrl = product.images[index];
-      return imgUrl.startsWith("http") ? imgUrl : `${BACKEND_BASE}${imgUrl}`;
-    }
+  const getImageUrl = (product) => {
     if (product.image_url) {
       return product.image_url.startsWith("http")
         ? product.image_url
@@ -100,104 +93,6 @@ const Store = () => {
     updateLocalStorage(newQuantities);
   };
 
-  // Render images according to layout
-  const renderImages = (product) => {
-    switch (layout) {
-      case "sideBySide":
-        return (
-          <div
-            style={{
-              display: "flex",
-              gap: "4px",
-              marginBottom: "0.5rem",
-              borderRadius: "12px",
-              overflow: "hidden",
-              border: "2px solid #e73fb8ff",
-            }}
-          >
-            {[0, 1, 2].map((idx) => (
-              <img
-                key={idx}
-                src={getImageUrl(product, idx)}
-                alt={`${product.name} ${idx + 1}`}
-                style={{ width: "33%", height: "200px", objectFit: "cover" }}
-                onError={(e) => {
-                  e.target.src = getPlaceholderSvg(product.name);
-                }}
-              />
-            ))}
-          </div>
-        );
-
-      case "grid":
-        return (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "4px",
-              marginBottom: "0.5rem",
-              borderRadius: "12px",
-              overflow: "hidden",
-              border: "2px solid #e73fb8ff",
-              height: "200px",
-            }}
-          >
-            {[0, 1, 2, 3].map(
-              (idx) =>
-                product.images &&
-                product.images[idx] && (
-                  <img
-                    key={idx}
-                    src={getImageUrl(product, idx)}
-                    alt={`${product.name} ${idx + 1}`}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    onError={(e) => {
-                      e.target.src = getPlaceholderSvg(product.name);
-                    }}
-                  />
-                )
-            )}
-          </div>
-        );
-
-      default:
-        // Carousel
-        return (
-          <div
-            style={{
-              width: "100%",
-              height: "200px",
-              borderRadius: "12px",
-              marginBottom: "0.5rem",
-              border: "2px solid #e73fb8ff",
-              backgroundColor: "#f0f0f0",
-              display: "flex",
-              overflowX: "auto",
-              scrollSnapType: "x mandatory",
-            }}
-          >
-            {[0, 1, 2].map((idx) => (
-              <img
-                key={idx}
-                src={getImageUrl(product, idx)}
-                alt={`${product.name} ${idx + 1}`}
-                style={{
-                  minWidth: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  scrollSnapAlign: "start",
-                }}
-                onError={(e) => {
-                  e.target.src = getPlaceholderSvg(product.name);
-                }}
-              />
-            ))}
-          </div>
-        );
-    }
-  };
-
   if (loading) {
     return (
       <div
@@ -213,69 +108,20 @@ const Store = () => {
     );
   }
 
+  const selectedProduct = products.find((p) => p.id === openDetailsId);
+
   return (
-    <div
-      style={{
-        background: "#ffd6eb",
-        minHeight: "100vh",
-        padding: "2rem",
-      }}
-    >
+    <div style={{ background: "#ffd6eb", minHeight: "100vh", padding: "2rem" }}>
       <h2
         style={{
           textAlign: "center",
           color: "#81C784",
-          marginBottom: "1rem",
+          marginBottom: "2rem",
           fontFamily: "sans-serif",
         }}
       >
         Bespoke Jewelry Store
       </h2>
-
-      {/* Layout Toggle */}
-      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <button
-          onClick={() => setLayout("carousel")}
-          style={{
-            marginRight: "8px",
-            padding: "6px 12px",
-            background: layout === "carousel" ? "#00cc66" : "#81C784",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Carousel
-        </button>
-        <button
-          onClick={() => setLayout("sideBySide")}
-          style={{
-            marginRight: "8px",
-            padding: "6px 12px",
-            background: layout === "sideBySide" ? "#00cc66" : "#81C784",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Side By Side
-        </button>
-        <button
-          onClick={() => setLayout("grid")}
-          style={{
-            padding: "6px 12px",
-            background: layout === "grid" ? "#00cc66" : "#81C784",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Grid
-        </button>
-      </div>
 
       {products.length === 0 ? (
         <div
@@ -314,7 +160,29 @@ const Store = () => {
                 (e.currentTarget.style.transform = "translateY(0)")
               }
             >
-              {renderImages(p)}
+              <div
+                style={{
+                  width: "100%",
+                  height: "200px",
+                  borderRadius: "12px",
+                  marginBottom: "0.5rem",
+                  border: "2px solid #e73fb8ff",
+                  backgroundColor: "#f0f0f0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={getImageUrl(p)}
+                  alt={p.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={(e) => {
+                    e.target.src = getPlaceholderSvg(p.name);
+                  }}
+                />
+              </div>
 
               <div
                 style={{
@@ -388,9 +256,7 @@ const Store = () => {
                   style={{
                     border: "none",
                     background:
-                      p.stock > (quantities[p.id] || 0)
-                        ? "#00cc66"
-                        : "#cccccc",
+                      p.stock > (quantities[p.id] || 0) ? "#00cc66" : "#cccccc",
                     color: "white",
                     width: "32px",
                     height: "32px",
@@ -398,9 +264,7 @@ const Store = () => {
                     fontSize: "1.2rem",
                     fontWeight: "bold",
                     cursor:
-                      p.stock > (quantities[p.id] || 0)
-                        ? "pointer"
-                        : "not-allowed",
+                      p.stock > (quantities[p.id] || 0) ? "pointer" : "not-allowed",
                   }}
                 >
                   +
@@ -421,17 +285,197 @@ const Store = () => {
                   fontWeight: "bold",
                   transition: "background 0.2s",
                 }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "#00994d")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "#00cc66")
-                }
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#00994d")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "#00cc66")}
               >
                 View Details
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Scrollable Modal with Jewelry Info & Additional Images */}
+      {selectedProduct && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+          onClick={() => setOpenDetailsId(null)}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "1rem",
+              borderRadius: "10px",
+              maxWidth: "500px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+              position: "relative",
+              border: "3px solid #00cc66",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setOpenDetailsId(null)}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                background: "#ff4444",
+                color: "white",
+                border: "none",
+                borderRadius: "50%",
+                width: "30px",
+                height: "30px",
+                cursor: "pointer",
+                fontSize: "16px",
+                fontWeight: "bold",
+              }}
+            >
+              ×
+            </button>
+
+            <h3 style={{ color: "#00cc66", marginBottom: "1rem", textAlign: "center" }}>
+              {selectedProduct.name}
+            </h3>
+
+            <div
+              style={{
+                width: "100%",
+                height: "250px",
+                borderRadius: "8px",
+                marginBottom: "1rem",
+                border: "2px solid #00cc66",
+                backgroundColor: "#f0f0f0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+              }}
+            >
+              <img
+                src={getImageUrl(selectedProduct)}
+                alt={selectedProduct.name}
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                onError={(e) => (e.target.src = getPlaceholderSvg(selectedProduct.name))}
+              />
+            </div>
+
+            {/* Jewelry Info */}
+            <div style={{ padding: "0 0.5rem" }}>
+              <p style={{ color: "#00994d", lineHeight: "1.5", marginBottom: "0.5rem" }}>
+                {selectedProduct.description || "No description available."}
+              </p>
+
+              <ul style={{ paddingLeft: "1rem", color: "#555", lineHeight: "1.4", fontSize: "0.95rem" }}>
+                <li><strong>Material:</strong> {selectedProduct.material || "Gold / Platinum / Silver"}</li>
+                <li><strong>Weight:</strong> {selectedProduct.weight || "5-15g"}</li>
+                <li><strong>Size:</strong> {selectedProduct.size || "Adjustable / Multiple Sizes"}</li>
+                <li><strong>Care Instructions:</strong> {selectedProduct.care || "Keep away from chemicals and moisture"}</li>
+              </ul>
+
+              {/* Beauty of Wearing Jewelry */}
+              <div style={{ marginTop: "1rem", color: "#444", fontStyle: "italic", lineHeight: "1.5" }}>
+                <strong>The Beauty of Wearing Jewelry:</strong>
+                <p>
+                  Wearing this exquisite piece enhances your elegance and adds a touch of sophistication to every outfit.
+                  It reflects your unique style, boosts confidence, and captures the admiration of everyone around you.
+                  Jewelry is not just an accessory; it is a statement of grace, charm, and timeless beauty.
+                </p>
+              </div>
+
+              {/* Additional Images Section */}
+              <div style={{ display: "flex", gap: "10px", marginTop: "1rem" }}>
+                <img
+                  src={getImageUrl(selectedProduct) /* Replace with another image if available */}
+                  alt={`${selectedProduct.name} - 1`}
+                  style={{ width: "48%", borderRadius: "8px", objectFit: "cover", border: "2px solid #00cc66" }}
+                />
+                <img
+                  src={getImageUrl(selectedProduct) /* Replace with another image if available */}
+                  alt={`${selectedProduct.name} - 2`}
+                  style={{ width: "48%", borderRadius: "8px", objectFit: "cover", border: "2px solid #00cc66" }}
+                />
+              </div>
+            </div>
+
+            {/* Price & Stock */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: "1rem",
+              }}
+            >
+              <div style={{ fontWeight: "bold", color: "#c2185b", fontSize: "1.2rem" }}>
+                Price: ₹ {selectedProduct.price}
+              </div>
+              <div style={{ color: "#666", fontSize: "0.9rem" }}>
+                Stock: {selectedProduct.stock} available
+              </div>
+            </div>
+
+            {/* Quantity Controls */}
+            <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "1rem" }}>
+              <button
+                onClick={() => decrease(selectedProduct)}
+                disabled={!quantities[openDetailsId]}
+                style={{
+                  background: quantities[openDetailsId] ? "#00cc66" : "#cccccc",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 16px",
+                  borderRadius: "5px",
+                  cursor: quantities[openDetailsId] ? "pointer" : "not-allowed",
+                  fontWeight: "bold",
+                }}
+              >
+                −
+              </button>
+
+              <span
+                style={{
+                  fontSize: "1.1rem",
+                  fontWeight: "bold",
+                  color: "#c2185b",
+                  padding: "0 16px",
+                }}
+              >
+                {quantities[openDetailsId] || 0}
+              </span>
+
+              <button
+                onClick={() => increase(selectedProduct)}
+                disabled={selectedProduct.stock <= (quantities[openDetailsId] || 0)}
+                style={{
+                  background:
+                    selectedProduct.stock > (quantities[openDetailsId] || 0) ? "#00cc66" : "#cccccc",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 16px",
+                  borderRadius: "5px",
+                  cursor:
+                    selectedProduct.stock > (quantities[openDetailsId] || 0) ? "pointer" : "not-allowed",
+                  fontWeight: "bold",
+                }}
+              >
+                +
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
