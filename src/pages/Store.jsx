@@ -136,34 +136,6 @@ const Store = () => {
         Bespoke Jewelry Store
       </h2>
 
-<<<<<<< HEAD
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "1.5rem"
-        }}
-      >
-        {products.map((p) => (
-          <div
-            key={p.id}
-            style={{
-              padding: "1rem",
-              background: "#7ae19ef6",
-              borderRadius: "15px",
-              boxShadow: "0 6px 15px rgba(0,0,0,0.1)",
-              textAlign: "center",
-              position: "relative",
-              transition: "transform 0.2s",
-              cursor: "pointer"
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-5px)"}
-            onMouseLeave={(e) => e.currentTarget.style.transform = "translateY(0)"}
-          >
-            <img
-              src={p.image}
-              alt={p.name}
-=======
       {products.length === 0 ? (
         <div
           style={{
@@ -185,7 +157,6 @@ const Store = () => {
           {products.map((p) => (
             <div
               key={p.id}
->>>>>>> f58b6e0dacfda089ab580049a03a59471034878c
               style={{
                 padding: "1rem",
                 background: "#81C784",
@@ -195,75 +166,12 @@ const Store = () => {
                 position: "relative",
                 transition: "transform 0.2s",
               }}
-<<<<<<< HEAD
-            />
-
-            <div style={{ fontWeight: 600, color: "#e73fb8ff", fontSize: "1.1rem" }}>{p.name}</div>
-            <div style={{ fontWeight: 600, color: "#e73fb8ff", marginTop: "4px" }}>₹ {p.price}</div>
-
-            {/* Quantity Controls - GREEN */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginTop: "10px", gap: "8px" }}>
-              <button
-                onClick={() => decrease(p)}
-                style={{
-                  border: "none",
-                  background: "#e182d1ff",
-
-                  color: "green",
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  cursor: "pointer"
-                }}
-              >−</button>
-
-              <span style={{ fontSize: "1rem", fontWeight: "bold", color: "white" }}>
-                {quantities[p.id] || 0}
-              </span>
-
-              <button
-                onClick={() => increase(p)}
-                style={{
-                  border: "none",
-                  background: "#e182d1ff",
-                  color: "white",
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  cursor: "pointer"
-                }}
-              >+</button>
-            </div>
-
-            {/* View Details Button - GREEN */}
-            <button
-              onClick={() => setOpenDetailsId(p.id)}
-              style={{
-                marginTop: "12px",
-                padding: "8px 12px",
-                background: "#e182d1ff",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                width: "100%",
-                fontWeight: "bold",
-                transition: "background 0.2s"
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "#82e187ff"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "#82e187ff"}
-=======
               onMouseEnter={(e) =>
                 (e.currentTarget.style.transform = "translateY(-5px)")
               }
               onMouseLeave={(e) =>
                 (e.currentTarget.style.transform = "translateY(0)")
               }
->>>>>>> f58b6e0dacfda089ab580049a03a59471034878c
             >
               {/* Product Image */}
               <div
