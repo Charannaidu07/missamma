@@ -40,7 +40,7 @@ function App() {
         </div>
         <Footer />
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </Router>
   );
 }
