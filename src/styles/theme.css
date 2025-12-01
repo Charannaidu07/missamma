@@ -54,3 +54,49 @@ body {
   border-radius: 999px;
   font-size: 0.7rem;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+    border-radius: 15px;
+  }
+  
+  .btn-primary {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 0.8rem;
+    border-radius: 12px;
+  }
+  
+  .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Improve touch targets on mobile */
+button, a {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Prevent zoom on input focus in mobile */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Remove tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
