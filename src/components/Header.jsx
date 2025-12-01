@@ -11,7 +11,7 @@ const Footer = () => {
         textAlign: "center",
       }}
     >
-      © {new Date().getFullYear()} Missamma Beauty Parlour • Crafted with care
+      {/* © {new Date().getFullYear()} Missamma Beauty Parlour • Crafted with care */}
     </footer>
   );
 };
