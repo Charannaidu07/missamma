@@ -153,7 +153,6 @@ const getPlaceholderSvg = (productName = "Product") => {
               >
                 {/* Product Image */}
                 <div style={styles.imageContainer}>
-                  // In your component, modify the image rendering part:
 <img
   src={getImageUrl(product)}
   alt={product.name}
