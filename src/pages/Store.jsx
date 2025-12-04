@@ -39,7 +39,7 @@ const Store = () => {
       <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#ff9a9e"/>
         <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">${productName}</text>
-        <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">No Image Available</text>
+        <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">No Image Available${product.image}</text>
       </svg>
     `)}`;
   };
