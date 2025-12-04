@@ -35,25 +35,28 @@ const Store = () => {
   }, []);
 
   const getPlaceholderSvg = (productName = "Product") => {
-    return `data:image/svg+xml;base64,${btoa(`
-      <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#ff9a9e"/>
-        <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">${productName}</text>
-        <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">No Image Available${product.image}</text>
-      </svg>
-    `)}`;
-  };
+  return `data:image/svg+xml;base64,${btoa(`
+    <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#ff9a9e"/>
+      <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">${productName}</text>
+      <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">No Image Available</text>
+    </svg>
+  `)}`;
+};
 
   const getImageUrl = (product) => {
+  console.log("Product image field:", product.image); // Debug log
+  
   if (product.image) {
-    // If image is a full URL, use it directly
-    if (product.image.startsWith("http")) {
-      return product.image;
-    }
-    // If image is a relative path, prepend backend base URL
-    return `${BACKEND_BASE}${product.image}`;
+    // Remove any leading slash if present
+    const imagePath = product.image.startsWith('/') ? product.image : `/${product.image}`;
+    
+    // Construct full URL
+    const fullUrl = `${BACKEND_BASE}${imagePath}`;
+    console.log("Constructed image URL:", fullUrl); // Debug log
+    return fullUrl;
   }
-  // Fallback to placeholder
+  
   return getPlaceholderSvg(product.name);
 };
 
