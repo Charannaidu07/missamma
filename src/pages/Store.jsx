@@ -3,7 +3,7 @@ import { api } from "../api";
 import { Link } from "react-router-dom";
 
 const BACKEND_BASE =
-  import.meta.env.VITE_BACKEND_BASE || " http://missamma.centralindia.cloudapp.azure.com";
+  import.meta.env.VITE_BACKEND_BASE || "https://missamma.centralindia.cloudapp.azure.com";
 
 const Store = () => {
   const [products, setProducts] = useState([]);

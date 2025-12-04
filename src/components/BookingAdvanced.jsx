@@ -1,9 +1,9 @@
-// File: src/components/Booking.jsx
+// File: src/components/BookingAdvanced.jsx
 import React, { useState, useEffect } from "react";
 import { api } from "../api";
 import { useNavigate } from "react-router-dom";
-import "./Booking.css";
-const Booking = () => {
+
+const BookingAdvanced = () => {
   const [step, setStep] = useState(1);
   const [services, setServices] = useState([]);
   const [filteredServices, setFilteredServices] = useState([]);
@@ -68,22 +68,14 @@ const Booking = () => {
     setFilteredServices(availableServices);
   };
 
-  // In Booking.jsx
-// In Booking.jsx
-const checkTimeSlots = async (serviceId, date) => {
-  try {
-    console.log('🔍 Checking time slots for service:', serviceId, 'date:', date);
-    
-    // Use the simple endpoint for testing
-    const res = await api.get(`/booking/check-slots-simple/?service_id=${serviceId}&date=${date}`);
-    console.log('✅ Time slots response:', res.data);
-    setTimeSlots(res.data.available_slots);
-  } catch (err) {
-    console.error('❌ Error checking time slots:', err);
-    console.error('❌ Error details:', err.response?.data);
-    alert("Error checking time slots: " + (err.response?.data?.error || "Please try again"));
-  }
-};
+  const checkTimeSlots = async (serviceId, date) => {
+    try {
+      const res = await api.get(`/booking/check-slots/?service_id=${serviceId}&date=${date}`);
+      setTimeSlots(res.data.available_slots);
+    } catch (err) {
+      alert("Error checking time slots");
+    }
+  };
 
   const handleServiceSelect = (service) => {
     setSelectedService(service);
@@ -117,63 +109,32 @@ const checkTimeSlots = async (serviceId, date) => {
     setStep(4); // Go to customer details
   };
 
-  // In Booking.jsx, update the handleSubmit function:
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  try {
-    console.log('🔍 Submitting booking form...');
-    console.log('🔍 Form data:', form);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    // Check if user is authenticated
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      alert("Please login to book an appointment");
-      navigate('/login', { state: { from: '/booking' } });
-      return;
-    }
-    
-    // Create appointment
-    const res = await api.post("/booking/appointments/", form);
-    console.log('✅ Appointment created:', res.data);
-    
-    if (selectedService.service_type === 'AT_HOME') {
-      // Create advance payment
-      const paymentRes = await api.post("/booking/create-payment/", {
-        appointment_id: res.data.id
-      });
+    try {
+      const res = await api.post("/booking/appointments/", form);
       
-      console.log('✅ Payment info:', paymentRes.data);
-      
-      // Redirect to payment page
-      navigate("/payment", { 
-        state: {
+      if (selectedService.service_type === 'AT_HOME') {
+        // Create advance payment
+        const paymentRes = await api.post("/booking/create-payment/", {
+          appointment_id: res.data.id
+        });
+        
+        // Redirect to payment page
+        navigate("/payment", { state: {
           amount: paymentRes.data.advance_amount,
           appointmentId: res.data.id,
           type: 'advance'
-        }
-      });
-    } else {
-      alert("Appointment booked successfully!");
-      navigate("/my-appointments");
+        }});
+      } else {
+        alert("Appointment booked successfully!");
+        navigate("/my-appointments");
+      }
+    } catch (err) {
+      alert("Booking failed: " + (err.response?.data?.detail || "Please try again"));
     }
-  } catch (err) {
-    console.error('❌ Booking failed:', err);
-    console.error('❌ Error response:', err.response?.data);
-    
-    if (err.response?.status === 401) {
-      alert("Your session has expired. Please login again.");
-      navigate('/login', { state: { from: '/booking' } });
-    } else if (err.response?.status === 403) {
-      alert("You don't have permission to book. Please login first.");
-      navigate('/login', { state: { from: '/booking' } });
-    } else {
-      alert("Booking failed: " + (err.response?.data?.detail || 
-                                err.response?.data?.error || 
-                                "Please try again"));
-    }
-  }
-};
+  };
 
   const getTomorrowDate = () => {
     const tomorrow = new Date();
@@ -390,4 +351,4 @@ const handleSubmit = async (e) => {
   );
 };
 
-export default Booking;
+export default BookingAdvanced;

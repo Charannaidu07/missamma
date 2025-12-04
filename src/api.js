@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://missamma.centralindia.cloudapp.azure.com/api",
+  baseURL: "https://missamma.centralindia.cloudapp.azure.com/api",
 });
 
 // Helper function to check if token is expired
@@ -17,46 +17,48 @@ const isTokenExpired = (token) => {
     return true;
   }
 };
-
-// Request interceptor
+// In your api.js file, update the request interceptor:
+// In api.js - Update the request interceptor
 api.interceptors.request.use(
-  // (config) => {
-  //   const token = localStorage.getItem("access");
+  (config) => {
+    console.log('🔍 [API Request] URL:', config.url);
+    console.log('🔍 [API Request] Method:', config.method);
     
-  //   if (token && !isTokenExpired(token)) {
-  //     config.headers.Authorization = `Bearer ${token}`;
-  //     console.log("✅ Token attached to request");
-  //   } else {
-  //     console.warn("❌ No valid token available");
-  //     delete config.headers.Authorization;
-  //     // Remove expired token
-  //     if (token) {
-  //       localStorage.removeItem("access");
-  //       localStorage.removeItem("refresh");
-  //     }
-  //   }
-    (config) => {
-    const token = localStorage.getItem("access");
-    console.log("🔍 Token from localStorage:", token ? "Exists" : "Missing");
+    const token = localStorage.getItem('access_token');
     
     if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        console.log("🔍 Token payload:", payload);
-        console.log("🔍 User ID:", payload.user_id);
-        console.log("🔍 Token expiry:", new Date(payload.exp * 1000));
-      } catch (e) {
-        console.error("🔍 Token decode error:", e);
+      console.log('✅ [API Request] Token found, length:', token.length);
+      console.log('✅ [API Request] Token first 20 chars:', token.substring(0, 20) + '...');
+      
+      // Try both JWT and Token authentication headers
+      config.headers['Authorization'] = `Bearer ${token}`;
+      // Also try Token authentication if JWT isn't working
+      config.headers['X-Authorization'] = token;
+      
+    } else {
+      console.warn('⚠️ [API Request] No token found in localStorage');
+      console.log('🔍 [API Request] localStorage contents:');
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        console.log(`  ${key}: ${localStorage.getItem(key)?.substring(0, 50)}...`);
       }
     }
+    
+    console.log('🔍 [API Request] Headers:', config.headers);
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('❌ [API Request] Interceptor error:', error);
+    return Promise.reject(error);
+  }
 );
 
-// Response interceptor to handle token refresh
+// Also add response interceptor to handle 401 errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ Response status:', response.status);
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     
@@ -64,31 +66,26 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        const refreshToken = localStorage.getItem("refresh");
-        if (!refreshToken) {
-          throw new Error("No refresh token");
+        // Try to refresh token
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+          const response = await axios.post(
+            'https://missamma.centralindia.cloudapp.azure.com/api/token/refresh/',
+            { refresh: refreshToken }
+          );
+          
+          const { access } = response.data;
+          localStorage.setItem('access_token', access);
+          
+          // Retry the original request with new token
+          originalRequest.headers['Authorization'] = `Bearer ${access}`;
+          return api(originalRequest);
         }
-        
-        console.log("🔄 Attempting token refresh...");
-        const response = await axios.post(
-  "http://missamma.centralindia.cloudapp.azure.com/api/accounts/token/refresh/",
-  { refresh: refreshToken }
-);
-
-        
-        const newAccessToken = response.data.access;
-        localStorage.setItem("access", newAccessToken);
-        
-        // Retry original request with new token
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
-        
       } catch (refreshError) {
-        console.error("❌ Token refresh failed:", refreshError);
-        // Redirect to login
-        localStorage.removeItem("access");
-        localStorage.removeItem("refresh");
-        window.location.href = "/login";
+        console.error('Token refresh failed:', refreshError);
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
       }
     }
     

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
@@ -14,84 +15,28 @@ const Services = ({ category: propCategory }) => {
   
   const activeCategory = propCategory || urlCategory;
 
-  // Static services data (fallback)
-  const staticServices = [
-    {
-      id: 1,
-      name: "Classic Facial",
-      description: "Deep cleansing facial with steam extraction and moisturizing",
-      price: 1200,
-      duration_minutes: 60,
-      category: "Facials & Skincare"
-    },
-    {
-      id: 2,
-      name: "Hair Cut & Style",
-      description: "Professional hair cutting and styling service",
-      price: 800,
-      duration_minutes: 45,
-      category: "Hair Styling"
-    },
-    {
-      id: 3,
-      name: "Bridal Makeup",
-      description: "Complete bridal makeup with trial session",
-      price: 5000,
-      duration_minutes: 120,
-      category: "Bridal Makeup"
-    },
-    {
-      id: 4,
-      name: "Full Body Waxing",
-      description: "Complete body waxing for smooth skin",
-      price: 1500,
-      duration_minutes: 90,
-      category: "Waxing"
-    },
-    {
-      id: 5,
-      name: "Spa Massage",
-      description: "Relaxing full body massage with aromatherapy",
-      price: 2000,
-      duration_minutes: 60,
-      category: "Spa Treatments"
-    },
-    {
-      id: 6,
-      name: "Manicure & Pedicure",
-      description: "Luxurious hand and foot care treatment",
-      price: 1000,
-      duration_minutes: 75,
-      category: "Manicure & Pedicure"
-    },
-    {
-      id: 7,
-      name: "Threading",
-      description: "Precise facial hair removal using thread",
-      price: 200,
-      duration_minutes: 15,
-      category: "Facials & Skincare"
-    },
-    {
-      id: 8,
-      name: "Hair Color",
-      description: "Professional hair coloring service",
-      price: 2500,
-      duration_minutes: 90,
-      category: "Hair Styling"
-    }
-  ];
-
   useEffect(() => {
     const fetchServices = async () => {
       try {
         setLoading(true);
+        console.log("Fetching services from API...");
         const response = await api.get("/booking/services/");
-        setServices(response.data);
+        
+        // Debug: Log what we receive from API
+        console.log("API Response:", response.data);
+        
+        // Ensure we have an array
+        if (Array.isArray(response.data)) {
+          setServices(response.data);
+          console.log("Services set successfully:", response.data.length);
+        } else {
+          console.error("API did not return an array:", response.data);
+          setServices([]);
+        }
       } catch (err) {
-        console.error("Error fetching services, using static data:", err);
-        // Use static data if API fails
-        setServices(staticServices);
+        console.error("Error fetching services:", err);
+        setError("Failed to load services. Please try again later.");
+        setServices([]);
       } finally {
         setLoading(false);
       }
@@ -102,26 +47,54 @@ const Services = ({ category: propCategory }) => {
 
   // Filter services by category if provided
   const filteredServices = activeCategory 
-    ? services.filter(service => 
-        service.category?.toLowerCase() === activeCategory.toLowerCase()
-      )
+    ? services.filter(service => {
+        // Handle null/undefined category
+        if (!service.category) return false;
+        
+        // Normalize strings for comparison
+        const serviceCategory = service.category.toLowerCase().trim();
+        const targetCategory = activeCategory.toLowerCase().trim();
+        
+        return serviceCategory === targetCategory;
+      })
     : services;
 
-  // Service categories mapping
-  const serviceCategories = [
-    { slug: 'facials-skincare', name: 'Facials & Skincare' },
-    { slug: 'hair-styling', name: 'Hair Styling' },
-    { slug: 'bridal-makeup', name: 'Bridal Makeup' },
-    { slug: 'spa-treatments', name: 'Spa Treatments' },
-    { slug: 'waxing', name: 'Waxing' },
-    { slug: 'manicure-pedicure', name: 'Manicure & Pedicure' }
-  ];
+  // Debug: Log filtered services
+  useEffect(() => {
+    console.log("Filtered services:", filteredServices);
+    console.log("Active category:", activeCategory);
+  }, [filteredServices, activeCategory]);
+
+  // Service categories mapping (dynamic based on available services)
+  const [serviceCategories, setServiceCategories] = useState([]);
+
+  useEffect(() => {
+    // Extract unique categories from services
+    const categories = {};
+    services.forEach(service => {
+      if (service.category && !categories[service.category]) {
+        // Create slug from category name
+        const slug = service.category
+          .toLowerCase()
+          .replace(/ & /g, ' and ')
+          .replace(/ /g, '-');
+        
+        categories[service.category] = {
+          slug: slug,
+          name: service.category
+        };
+      }
+    });
+    
+    setServiceCategories(Object.values(categories));
+  }, [services]);
 
   if (loading) {
     return (
       <div className="card">
         <h2>{activeCategory || 'Beauty Services'}</h2>
         <div style={{ textAlign: 'center', padding: '2rem' }}>
+          <div className="spinner"></div>
           <div>Loading services...</div>
         </div>
       </div>
@@ -133,7 +106,22 @@ const Services = ({ category: propCategory }) => {
       <div className="card">
         <h2>{activeCategory || 'Beauty Services'}</h2>
         <div style={{ color: '#e74c3c', textAlign: 'center', padding: '2rem' }}>
-          {error}
+          <h3>Error Loading Services</h3>
+          <p>{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: '1rem',
+              padding: '0.5rem 1rem',
+              backgroundColor: '#e84393',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -196,7 +184,7 @@ const Services = ({ category: propCategory }) => {
       )}
 
       {/* Service Categories Navigation */}
-      {!activeCategory && (
+      {!activeCategory && serviceCategories.length > 0 && (
         <div style={{ margin: '1.5rem 0' }}>
           <h3 style={{ 
             fontSize: '1.1rem', 
@@ -264,6 +252,7 @@ const Services = ({ category: propCategory }) => {
                 border: '1px solid #e9ecef',
                 cursor: 'pointer'
               }}
+              onClick={() => window.location.href = `/booking?service=${service.id}`}
               onMouseEnter={(e) => {
                 if (window.innerWidth > 768) {
                   e.currentTarget.style.transform = 'translateY(-5px)';
@@ -284,6 +273,18 @@ const Services = ({ category: propCategory }) => {
                 marginBottom: '0.5rem'
               }}>
                 {service.name}
+                {service.service_type === 'AT_HOME' && (
+                  <span style={{
+                    fontSize: '0.7rem',
+                    backgroundColor: '#e84393',
+                    color: 'white',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '3px',
+                    marginLeft: '0.5rem'
+                  }}>
+                    🏠 Home Service
+                  </span>
+                )}
               </div>
               
               {service.category && (
@@ -324,7 +325,7 @@ const Services = ({ category: propCategory }) => {
 
               {/* Book Now Button */}
               <Link 
-                to="/booking"
+                to={`/booking?service=${service.id}`}
                 style={{
                   display: 'block',
                   width: '100%',
@@ -365,7 +366,7 @@ const Services = ({ category: propCategory }) => {
           }}>
             {activeCategory ? (
               <div>
-                <h3 style={{ marginBottom: '0.5rem' }}>No services found in {activeCategory}</h3>
+                <h3 style={{ marginBottom: '0.5rem' }}>No services found in "{activeCategory}"</h3>
                 <p style={{ marginBottom: '1rem' }}>Please check back later or browse our other service categories.</p>
                 <Link 
                   to="/services" 
@@ -389,6 +390,19 @@ const Services = ({ category: propCategory }) => {
               <div>
                 <h3 style={{ marginBottom: '0.5rem' }}>No services available at the moment</h3>
                 <p style={{ marginBottom: '1rem' }}>Please check back later for our service offerings.</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#e84393',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Refresh
+                </button>
               </div>
             )}
           </div>
