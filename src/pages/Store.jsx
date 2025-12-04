@@ -45,18 +45,17 @@ const Store = () => {
   };
 
   const getImageUrl = (product) => {
-    if (product.image_url) {
-      return product.image_url.startsWith("http")
-        ? product.image_url
-        : `${BACKEND_BASE}${product.image_url}`;
+  if (product.image) {
+    // If image is a full URL, use it directly
+    if (product.image.startsWith("http")) {
+      return product.image;
     }
-    if (product.image) {
-      return product.image.startsWith("http")
-        ? product.image
-        : `${BACKEND_BASE}${product.image}`;
-    }
-    return getPlaceholderSvg(product.name);
-  };
+    // If image is a relative path, prepend backend base URL
+    return `${BACKEND_BASE}${product.image}`;
+  }
+  // Fallback to placeholder
+  return getPlaceholderSvg(product.name);
+};
 
   const updateLocalStorage = (newQuantities) => {
     let cart = [];
