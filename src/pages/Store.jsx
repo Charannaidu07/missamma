@@ -35,28 +35,22 @@ const Store = () => {
   }, []);
 
   const getPlaceholderSvg = (productName = "Product") => {
-  return `data:image/svg+xml;base64,${btoa(`
+  const svgContent = `
     <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
       <rect width="100%" height="100%" fill="#ff9a9e"/>
       <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">${productName}</text>
       <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">No Image Available</text>
     </svg>
-  `)}`;
+  `;
+  return `data:image/svg+xml;base64,${btoa(svgContent)}`;
 };
 
   const getImageUrl = (product) => {
-  console.log("Product image field:", product.image); // Debug log
-  
+  // Directly return the image URL if it exists
   if (product.image) {
-    // Remove any leading slash if present
-    const imagePath = product.image.startsWith('/') ? product.image : `/${product.image}`;
-    
-    // Construct full URL
-    const fullUrl = `${BACKEND_BASE}${imagePath}`;
-    console.log("Constructed image URL:", fullUrl); // Debug log
-    return fullUrl;
+    return product.image;
   }
-  
+  // Fallback to placeholder
   return getPlaceholderSvg(product.name);
 };
 
