@@ -34,7 +34,14 @@ const Store = () => {
     fetchProducts();
   }, []);
 
-  const getPlaceholderSvg = (productName = "Product") => {
+  const getImageUrl = (product) => {
+  if (product.image) {
+    return product.image;
+  }
+  return getPlaceholderSvg(product.name);
+};
+
+const getPlaceholderSvg = (productName = "Product") => {
   const svgContent = `
     <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
       <rect width="100%" height="100%" fill="#ff9a9e"/>
@@ -43,15 +50,6 @@ const Store = () => {
     </svg>
   `;
   return `data:image/svg+xml;base64,${btoa(svgContent)}`;
-};
-
-  const getImageUrl = (product) => {
-  // Directly return the image URL if it exists
-  if (product.image) {
-    return product.image;
-  }
-  // Fallback to placeholder
-  return getPlaceholderSvg(product.name);
 };
 
   const updateLocalStorage = (newQuantities) => {
@@ -155,14 +153,20 @@ const Store = () => {
               >
                 {/* Product Image */}
                 <div style={styles.imageContainer}>
-                  <img
-                    src={getImageUrl(product)}
-                    alt={product.name}
-                    style={styles.productImage}
-                    onError={(e) => {
-                      e.target.src = getPlaceholderSvg(product.name);
-                    }}
-                  />
+                  // In your component, modify the image rendering part:
+<img
+  src={getImageUrl(product)}
+  alt={product.name}
+  style={styles.productImage}
+  onError={(e) => {
+    console.error("Image failed to load:", e.target.src);
+    console.log("Product data:", product);
+    e.target.src = getPlaceholderSvg(product.name);
+  }}
+  onLoad={(e) => {
+    console.log("Image loaded successfully:", e.target.src);
+  }}
+/>
                   <div style={styles.stockBadge}>
                     {product.stock} available
                   </div>
