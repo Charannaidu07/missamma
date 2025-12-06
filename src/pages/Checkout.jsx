@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api, checkAuth, getToken } from "../api";
 import { useNavigate } from "react-router-dom";
+import './Checkout.css';
 
 const loadScript = (src) =>
   new Promise((resolve) => {
@@ -41,27 +42,32 @@ const isValidPhone = (phone) => {
   return cleaned.length >= 10;
 };
 
+const isValidEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 const Checkout = () => {
   const [cart, setCart] = useState([]);
   const [billing, setBilling] = useState({
     billing_name: "",
     billing_address: "",
     billing_phone: "",
+    billing_email: ""
   });
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("razorpay");
   const [debugInfo, setDebugInfo] = useState("");
+  const [activeStep, setActiveStep] = useState(1);
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check authentication
     if (!checkAuth()) {
       alert("Please login to checkout");
       navigate("/login?from=/checkout");
       return;
     }
     
-    // Load cart
     const cartData = localStorage.getItem("cart");
     if (cartData) {
       try {
@@ -75,8 +81,9 @@ const Checkout = () => {
       }
     }
     
-    // Pre-fill billing info
     const userInfo = localStorage.getItem("user_info");
+    const userEmail = localStorage.getItem("user_email");
+    
     if (userInfo) {
       try {
         const user = JSON.parse(userInfo);
@@ -84,6 +91,7 @@ const Checkout = () => {
           ...prev,
           billing_name: user.name || user.username || "",
           billing_phone: user.phone || user.phone_number || "",
+          billing_email: userEmail || user.email || ""
         }));
       } catch (error) {
         console.error("Error parsing user info:", error);
@@ -91,98 +99,71 @@ const Checkout = () => {
     }
   }, [navigate]);
 
-  const validateForm = () => {
-    if (!cart || cart.length === 0) {
-      alert("Your cart is empty");
-      return false;
+  const validateCurrentStep = () => {
+    const newErrors = {};
+    
+    if (activeStep === 2) {
+      if (!billing.billing_name?.trim()) {
+        newErrors.billing_name = "Name is required";
+      }
+      
+      if (!billing.billing_email?.trim()) {
+        newErrors.billing_email = "Email is required";
+      } else if (!isValidEmail(billing.billing_email)) {
+        newErrors.billing_email = "Please enter a valid email";
+      }
+      
+      if (!billing.billing_phone?.trim()) {
+        newErrors.billing_phone = "Phone number is required";
+      } else if (!isValidPhone(billing.billing_phone)) {
+        newErrors.billing_phone = "Please enter a valid 10-digit phone number";
+      }
+      
+      if (!billing.billing_address?.trim()) {
+        newErrors.billing_address = "Address is required";
+      }
     }
     
-    if (!billing.billing_name?.trim()) {
-      alert("Please enter your name");
-      return false;
-    }
-    
-    if (!billing.billing_address?.trim()) {
-      alert("Please enter your address");
-      return false;
-    }
-    
-    if (!billing.billing_phone?.trim() || !isValidPhone(billing.billing_phone)) {
-      alert("Please enter a valid 10-digit phone number");
-      return false;
-    }
-    
-    return true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Direct backend test function
-  const testBackendDirectly = async () => {
-    const token = getToken();
-    if (!token) {
-      alert("No token found. Please login again.");
+  const handleContinue = () => {
+    if (activeStep === 1 && cart.length === 0) {
+      alert("Your cart is empty");
       return;
     }
-
-    setDebugInfo("Testing backend connection...");
     
-    try {
-      // Simple test payload
-      const testPayload = {
-        cart_items: [{
-          product_id: 2,
-          quantity: 1,
-          price: 2000
-        }],
-        billing_name: "Test User",
-        billing_address: "Test Address",
-        billing_phone: "1234567890",
-        total_amount: "2360.00"
-      };
+    if (activeStep === 2 && !validateCurrentStep()) {
+      return;
+    }
+    
+    setActiveStep(activeStep + 1);
+  };
 
-      const response = await fetch('https://missamma.centralindia.cloudapp.azure.com/api/payments/create-order/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(testPayload)
-      });
-      
-      console.log("📡 Direct test response:", response.status, response.statusText);
-      
-      if (response.status === 500) {
-        const text = await response.text();
-        setDebugInfo(`Server 500 error`);
-        alert("Backend returned 500 error. Check console for details.");
-        console.error("Server error HTML:", text.substring(0, 500));
-      } else if (response.ok) {
-        const data = await response.json();
-        setDebugInfo(`Test successful! Order ID: ${data.order_id}`);
-        alert(`Backend test successful! Order created: ${data.order_id}`);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        setDebugInfo(`Test failed: ${response.status}`);
-        alert(`Backend test failed: ${response.status} ${JSON.stringify(errorData)}`);
-      }
-    } catch (error) {
-      console.error("❌ Direct test error:", error);
-      setDebugInfo(`Test error: ${error.message}`);
-      alert(`Test failed: ${error.message}`);
+  const handleBack = () => {
+    if (activeStep > 1) {
+      setActiveStep(activeStep - 1);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setBilling(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }));
     }
   };
 
   const handleRazorpayPayment = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateCurrentStep()) return;
     
     setLoading(true);
-    setPaymentMethod("razorpay");
 
     try {
-      console.log("🛒 Processing cart items:", cart.length);
-      
-      // Prepare cart items
       const cartItems = cart.map((item) => ({
         product_id: item.product_id || item.id || 0,
         quantity: getSafeQuantity(item),
@@ -195,6 +176,7 @@ const Checkout = () => {
         billing_name: billing.billing_name.trim(),
         billing_address: billing.billing_address.trim(),
         billing_phone: billing.billing_phone.replace(/\D/g, '').slice(0, 10),
+        billing_email: billing.billing_email.trim(),
         payment_method: "razorpay",
         total_amount: total.toFixed(2),
         notes: `Order from ${billing.billing_name}`
@@ -203,7 +185,6 @@ const Checkout = () => {
       console.log("📦 Sending payload:", JSON.stringify(payload, null, 2));
       setDebugInfo("Creating order...");
 
-      // 1. Create Order
       const res = await api.post("/payments/create-order/", payload);
       console.log("✅ Create-order response:", res.data);
 
@@ -214,7 +195,6 @@ const Checkout = () => {
       const { order_id, razorpay_order_id, amount, currency, razorpay_key } = res.data;
       setDebugInfo(`Order created: ${order_id}`);
 
-      // 2. Load Razorpay SDK
       const scriptLoaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
       
       if (!scriptLoaded) {
@@ -223,7 +203,6 @@ const Checkout = () => {
         return;
       }
 
-      // 3. Open Payment Modal
       const options = {
         key: razorpay_key,
         amount: amount.toString(),
@@ -236,7 +215,6 @@ const Checkout = () => {
           setDebugInfo("Verifying payment...");
           
           try {
-            // 4. Verify Payment
             const verifyRes = await api.post("/payments/verify-payment/", {
               order_id: order_id,
               razorpay_order_id: response.razorpay_order_id,
@@ -250,7 +228,6 @@ const Checkout = () => {
               alert(`Payment successful! Invoice: ${verifyRes.data.invoice_no}`);
               localStorage.removeItem("cart");
               
-              // Open invoice in new tab
               const token = getToken();
               const invoiceUrl = `https://missamma.centralindia.cloudapp.azure.com/api/payments/invoice/${order_id}/?token=${token}`;
               window.open(invoiceUrl, "_blank");
@@ -270,10 +247,10 @@ const Checkout = () => {
         prefill: {
           name: billing.billing_name,
           contact: billing.billing_phone,
-          email: localStorage.getItem("user_email") || "",
+          email: billing.billing_email,
         },
         theme: {
-          color: "#2e7d32",
+          color: "#FF6B8B",
         },
         modal: {
           ondismiss: function () {
@@ -305,10 +282,7 @@ const Checkout = () => {
       let errorMessage = "Failed to create order.";
       
       if (err.response?.status === 500) {
-        errorMessage = "Server Error (500)\n\n";
-        errorMessage += "The backend server encountered an error.\n";
-        errorMessage += "Please contact the administrator.\n\n";
-        errorMessage += "Error details in console.";
+        errorMessage = "Server Error (500)\n\nThe backend server encountered an error.\nPlease contact the administrator.\n\nError details in console.";
         
         if (err.response?.data && typeof err.response.data === 'string') {
           console.error("🔍 Server 500 error HTML:", err.response.data.substring(0, 500));
@@ -326,10 +300,9 @@ const Checkout = () => {
   };
 
   const handleWalletPayment = async () => {
-    if (!validateForm()) return;
+    if (!validateCurrentStep()) return;
     
     setLoading(true);
-    setPaymentMethod("wallet");
 
     try {
       const cartItems = cart.map((item) => ({
@@ -344,6 +317,7 @@ const Checkout = () => {
         billing_name: billing.billing_name.trim(),
         billing_address: billing.billing_address.trim(),
         billing_phone: billing.billing_phone.replace(/\D/g, '').slice(0, 10),
+        billing_email: billing.billing_email.trim(),
         payment_method: "wallet",
         total_amount: total.toFixed(2)
       });
@@ -354,7 +328,6 @@ const Checkout = () => {
         alert(`Wallet payment successful! Invoice: ${res.data.invoice_no}`);
         localStorage.removeItem("cart");
         
-        // Open invoice
         const token = getToken();
         const invoiceUrl = `https://missamma.centralindia.cloudapp.azure.com/api/payments/invoice/${res.data.order_id}/?token=${token}`;
         window.open(invoiceUrl, "_blank");
@@ -379,7 +352,6 @@ const Checkout = () => {
     }
   };
 
-  // Calculate totals
   const subtotal = cart.reduce((sum, item) => {
     const price = getSafePrice(item);
     const quantity = getSafeQuantity(item);
@@ -389,305 +361,330 @@ const Checkout = () => {
   const tax = subtotal * 0.18;
   const total = subtotal + tax;
 
-  // Show loading state
   if (loading) {
     return (
-      <div className="card" style={{ textAlign: "center", padding: "3rem" }}>
-        <h2>Processing {paymentMethod} Payment...</h2>
-        <div style={{ margin: "2rem 0" }}>
-          <div style={{
-            border: "4px solid #f3f3f3",
-            borderTop: "4px solid #2e7d32",
-            borderRadius: "50%",
-            width: "40px",
-            height: "40px",
-            animation: "spin 1s linear infinite",
-            margin: "0 auto"
-          }}></div>
+      <div className="checkout-loading">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <div className="loading-text">
+            <h3>Processing {paymentMethod === "razorpay" ? "Razorpay" : "Wallet"} Payment</h3>
+            <p>Please wait while we process your payment...</p>
+            {debugInfo && <p className="debug-info">{debugInfo}</p>}
+          </div>
         </div>
-        <p>Please wait while we process your payment.</p>
-        {debugInfo && (
-          <p style={{ fontSize: "0.9rem", color: "#666", marginTop: "1rem" }}>
-            {debugInfo}
-          </p>
-        )}
       </div>
     );
   }
 
   if (cart.length === 0) {
     return (
-      <div className="card" style={{ textAlign: "center", padding: "3rem" }}>
-        <h2>Your Cart is Empty</h2>
-        <button
-          onClick={() => navigate("/")}
-          style={{
-            padding: "0.8rem 1.5rem",
-            background: "#2e7d32",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            marginTop: "1rem"
-          }}
-        >
-          Continue Shopping
-        </button>
+      <div className="empty-cart">
+        <div className="empty-cart-content">
+          <div className="empty-cart-icon">🌸</div>
+          <h2>Your Cart is Beautifully Empty</h2>
+          <p>Discover our amazing beauty products and services</p>
+          <button className="continue-shopping-btn" onClick={() => navigate("/")}>
+            Explore Services
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="card">
-      <h2>Checkout</h2>
-      
-      {/* Debug info */}
-      {debugInfo && (
-        <div style={{
-          padding: "0.8rem",
-          background: "#fff3cd",
-          border: "1px solid #ffeaa7",
-          borderRadius: "5px",
-          marginBottom: "1rem",
-          fontSize: "0.9rem"
-        }}>
-          ℹ️ {debugInfo}
+    <div className="checkout-container">
+      <div className="checkout-header">
+        <div className="header-content">
+          <button className="back-btn" onClick={handleBack}>
+            ← Back
+          </button>
+          <h1>Complete Your Beauty Journey</h1>
+          <div className="cart-indicator">
+            <span className="cart-icon">🛒</span>
+            <span className="cart-count">{cart.length} items</span>
+          </div>
         </div>
-      )}
-      
-      {/* Cart Summary */}
-      <div style={{
-        background: "#f9f9f9",
-        borderRadius: "10px",
-        padding: "1.5rem",
-        marginBottom: "2rem"
-      }}>
-        <h3>Order Summary ({cart.length} items)</h3>
-        {cart.map((item, index) => {
-          const price = getSafePrice(item);
-          const quantity = getSafeQuantity(item);
-          const itemTotal = price * quantity;
-          
-          return (
-            <div key={index} style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0.8rem 0",
-              borderBottom: "1px solid #eee"
-            }}>
-              <div style={{ flex: 1 }}>
-                <strong>{item.name || `Item ${index + 1}`}</strong>
-                <div style={{ fontSize: "0.9rem", color: "#666", marginTop: "0.2rem" }}>
-                  ID: {item.product_id || item.id} • Qty: {quantity} × ₹{price.toFixed(2)}
+      </div>
+
+      {/* Progress Steps */}
+      <div className="checkout-progress">
+        <div className={`progress-step ${activeStep >= 1 ? 'active' : ''}`}>
+          <div className="step-circle">
+            <div className="step-number">1</div>
+          </div>
+          <div className="step-label">Review Cart</div>
+        </div>
+        <div className={`progress-step ${activeStep >= 2 ? 'active' : ''}`}>
+          <div className="step-circle">
+            <div className="step-number">2</div>
+          </div>
+          <div className="step-label">Your Details</div>
+        </div>
+        <div className={`progress-step ${activeStep >= 3 ? 'active' : ''}`}>
+          <div className="step-circle">
+            <div className="step-number">3</div>
+          </div>
+          <div className="step-label">Payment</div>
+        </div>
+      </div>
+
+      <div className="checkout-main">
+        {/* Left Column - Forms */}
+        <div className="checkout-form-section">
+          {activeStep === 1 && (
+            <div className="step-content cart-step">
+              <h2 className="step-title">
+                <span className="step-icon">🛍️</span>
+                Your Shopping Cart
+              </h2>
+              <div className="cart-items-list">
+                {cart.map((item, index) => {
+                  const price = getSafePrice(item);
+                  const quantity = getSafeQuantity(item);
+                  const itemTotal = price * quantity;
+                  
+                  return (
+                    <div key={index} className="cart-item-card">
+                      <div className="cart-item-image">
+                        {item.image ? (
+                          <img src={item.image} alt={item.name} />
+                        ) : (
+                          <div className="item-placeholder">💄</div>
+                        )}
+                      </div>
+                      <div className="cart-item-info">
+                        <h3>{item.name || `Beauty Service ${index + 1}`}</h3>
+                        <div className="item-meta">
+                          <span className="item-id">#{item.product_id || item.id}</span>
+                          <span className="item-qty">Qty: {quantity}</span>
+                        </div>
+                        <div className="item-price-display">
+                          <span className="unit-price">₹{price.toFixed(2)} each</span>
+                          <span className="item-total">₹{itemTotal.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {activeStep === 2 && (
+            <div className="step-content details-step">
+              <h2 className="step-title">
+                <span className="step-icon">👤</span>
+                Your Information
+              </h2>
+              <form className="billing-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="name">Full Name *</label>
+                    <input
+                      id="name"
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={billing.billing_name}
+                      onChange={(e) => handleInputChange('billing_name', e.target.value)}
+                      className={errors.billing_name ? 'error' : ''}
+                    />
+                    {errors.billing_name && <span className="error-message">{errors.billing_name}</span>}
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="email">Email Address *</label>
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={billing.billing_email}
+                      onChange={(e) => handleInputChange('billing_email', e.target.value)}
+                      className={errors.billing_email ? 'error' : ''}
+                    />
+                    {errors.billing_email && <span className="error-message">{errors.billing_email}</span>}
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="phone">Phone Number *</label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    placeholder="10-digit mobile number"
+                    value={billing.billing_phone}
+                    onChange={(e) => handleInputChange('billing_phone', e.target.value)}
+                    className={errors.billing_phone ? 'error' : ''}
+                  />
+                  {errors.billing_phone && <span className="error-message">{errors.billing_phone}</span>}
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="address">Shipping Address *</label>
+                  <textarea
+                    id="address"
+                    placeholder="Enter your complete address for delivery"
+                    value={billing.billing_address}
+                    onChange={(e) => handleInputChange('billing_address', e.target.value)}
+                    rows={3}
+                    className={errors.billing_address ? 'error' : ''}
+                  />
+                  {errors.billing_address && <span className="error-message">{errors.billing_address}</span>}
+                </div>
+              </form>
+            </div>
+          )}
+
+          {activeStep === 3 && (
+            <div className="step-content payment-step">
+              <h2 className="step-title">
+                <span className="step-icon">💳</span>
+                Payment Method
+              </h2>
+              <div className="payment-options">
+                <div 
+                  className={`payment-card ${paymentMethod === 'razorpay' ? 'selected' : ''}`}
+                  onClick={() => setPaymentMethod('razorpay')}
+                >
+                  <div className="payment-card-header">
+                    <div className="payment-icon">💳</div>
+                    <div className="payment-title">
+                      <h3>Card Payment</h3>
+                      <p>Pay with credit/debit card or UPI</p>
+                    </div>
+                    <div className="payment-radio">
+                      <div className={`radio-circle ${paymentMethod === 'razorpay' ? 'checked' : ''}`}></div>
+                    </div>
+                  </div>
+                  <div className="payment-card-logos">
+                    <span>Visa</span>
+                    <span>Mastercard</span>
+                    <span>Rupay</span>
+                    <span>UPI</span>
+                  </div>
+                </div>
+                
+                <div 
+                  className={`payment-card ${paymentMethod === 'wallet' ? 'selected' : ''}`}
+                  onClick={() => setPaymentMethod('wallet')}
+                >
+                  <div className="payment-card-header">
+                    <div className="payment-icon">💰</div>
+                    <div className="payment-title">
+                      <h3>Missamma Wallet</h3>
+                      <p>Use your beauty wallet balance</p>
+                    </div>
+                    <div className="payment-radio">
+                      <div className={`radio-circle ${paymentMethod === 'wallet' ? 'checked' : ''}`}></div>
+                    </div>
+                  </div>
+                  <div className="wallet-info">
+                    <div className="wallet-balance">
+                      <span>Available Balance:</span>
+                      <span className="balance-amount">₹0.00</span>
+                    </div>
+                    <button className="add-funds-btn">Add Funds</button>
+                  </div>
                 </div>
               </div>
-              <div style={{ fontWeight: "600" }}>₹ {itemTotal.toFixed(2)}</div>
             </div>
-          );
-        })}
-        
-        <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "2px solid #ddd" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-            <span>Subtotal:</span>
-            <span>₹ {subtotal.toFixed(2)}</span>
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem" }}>
-            <span>Tax (18%):</span>
-            <span>₹ {tax.toFixed(2)}</span>
-          </div>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontWeight: "bold",
-            color: "#2e7d32",
-            fontSize: "1.2rem",
-            marginTop: "1rem",
-            paddingTop: "1rem",
-            borderTop: "1px solid #ccc"
-          }}>
-            <span>Total:</span>
-            <span>₹ {total.toFixed(2)}</span>
-          </div>
-        </div>
-      </div>
+          )}
 
-      {/* Billing Form */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h3>Billing Information</h3>
-        <form onSubmit={handleRazorpayPayment}>
-          <div style={{ marginBottom: "1.2rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>
-              Full Name *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="Enter your full name"
-              value={billing.billing_name}
-              onChange={(e) => setBilling({ ...billing, billing_name: e.target.value })}
-              disabled={loading}
-              style={{ 
-                width: "100%", 
-                padding: "0.8rem",
-                border: "1px solid #ddd",
-                borderRadius: "5px"
-              }}
-            />
-          </div>
-          
-          <div style={{ marginBottom: "1.2rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>
-              Phone Number *
-            </label>
-            <input
-              type="tel"
-              required
-              placeholder="Enter your 10-digit phone number"
-              value={billing.billing_phone}
-              onChange={(e) => setBilling({ ...billing, billing_phone: e.target.value })}
-              disabled={loading}
-              style={{ 
-                width: "100%", 
-                padding: "0.8rem",
-                border: "1px solid #ddd",
-                borderRadius: "5px"
-              }}
-            />
-          </div>
-          
-          <div style={{ marginBottom: "1.2rem" }}>
-            <label style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600" }}>
-              Billing Address *
-            </label>
-            <textarea
-              required
-              placeholder="Enter complete address"
-              value={billing.billing_address}
-              onChange={(e) => setBilling({ ...billing, billing_address: e.target.value })}
-              disabled={loading}
-              rows={4}
-              style={{ 
-                width: "100%", 
-                padding: "0.8rem",
-                border: "1px solid #ddd",
-                borderRadius: "5px"
-              }}
-            />
-          </div>
-
-          {/* Payment Methods */}
-          <div style={{ marginTop: "2rem" }}>
-            <h3>Select Payment Method</h3>
+          <div className="step-navigation">
+            {activeStep > 1 && (
+              <button className="nav-btn prev-btn" onClick={handleBack}>
+                ← Previous Step
+              </button>
+            )}
             
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: "1rem",
-                marginBottom: "1rem",
-                border: "none",
-                borderRadius: "5px",
-                background: "#2e7d32",
-                color: "white",
-                fontSize: "1rem",
-                fontWeight: "600",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.6 : 1
-              }}
-            >
-              Pay with Razorpay
-            </button>
-            
-            <button
-              type="button"
-              onClick={handleWalletPayment}
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: "1rem",
-                marginBottom: "1rem",
-                border: "2px solid #2e7d32",
-                borderRadius: "5px",
-                background: "white",
-                color: "#2e7d32",
-                fontSize: "1rem",
-                fontWeight: "600",
-                cursor: loading ? "not-allowed" : "pointer",
-                opacity: loading ? 0.6 : 1
-              }}
-            >
-              Pay with Wallet
-            </button>
+            {activeStep < 3 ? (
+              <button className="nav-btn next-btn" onClick={handleContinue}>
+                Continue to {activeStep === 1 ? 'Details' : 'Payment'} →
+              </button>
+            ) : (
+              <form onSubmit={paymentMethod === 'razorpay' ? handleRazorpayPayment : handleWalletPayment}>
+                <button type="submit" className="nav-btn pay-btn">
+                  Complete Payment ₹{total.toFixed(2)}
+                </button>
+              </form>
+            )}
           </div>
-        </form>
-      </div>
+        </div>
 
-      {/* Debug Section */}
-      <div style={{
-        marginTop: "2rem",
-        padding: "1rem",
-        background: "#f5f5f5",
-        borderRadius: "8px",
-        fontSize: "0.9rem"
-      }}>
-        <h4>Debug Tools</h4>
-        <div style={{ marginBottom: "1rem" }}>
-          <div>Cart Items: {cart.length}</div>
-          <div>Product IDs: {cart.map(item => item.product_id || item.id).join(', ')}</div>
-          <div>Total: ₹{total.toFixed(2)}</div>
-        </div>
-        
-        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-          <button
-            onClick={testBackendDirectly}
-            style={{
-              padding: "0.5rem 1rem",
-              background: "#f8f9fa",
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Test Backend Directly
-          </button>
+        {/* Right Column - Order Summary */}
+        <div className="order-summary-section">
+          <div className="order-summary-card">
+            <div className="summary-header">
+              <h2>Order Summary</h2>
+              <div className="order-id">#ORDER-{Date.now().toString().slice(-6)}</div>
+            </div>
+            
+            <div className="order-items-summary">
+              {cart.slice(0, 3).map((item, index) => {
+                const price = getSafePrice(item);
+                const quantity = getSafeQuantity(item);
+                const itemTotal = price * quantity;
+                
+                return (
+                  <div key={index} className="summary-item">
+                    <div className="item-summary">
+                      <span className="item-name">{item.name?.substring(0, 20) || `Item ${index + 1}`}</span>
+                      <span className="item-qty-summary">×{quantity}</span>
+                    </div>
+                    <div className="item-price-summary">₹{itemTotal.toFixed(2)}</div>
+                  </div>
+                );
+              })}
+              {cart.length > 3 && (
+                <div className="more-items-summary">
+                  +{cart.length - 3} more beauty items
+                </div>
+              )}
+            </div>
+            
+            <div className="order-totals-summary">
+              <div className="total-line">
+                <span>Subtotal</span>
+                <span>₹{subtotal.toFixed(2)}</span>
+              </div>
+              <div className="total-line">
+                <span>GST (18%)</span>
+                <span>₹{tax.toFixed(2)}</span>
+              </div>
+              <div className="total-line shipping-line">
+                <span>Delivery</span>
+                <span className="free">FREE</span>
+              </div>
+              <div className="total-line grand-total-line">
+                <span>Total Amount</span>
+                <span className="grand-total">₹{total.toFixed(2)}</span>
+              </div>
+            </div>
+            
+            <div className="security-badge">
+              <div className="security-icon">🔒</div>
+              <div className="security-text">
+                <strong>100% Secure Payment</strong>
+                <p>Your payment information is encrypted</p>
+              </div>
+            </div>
+            
+            <div className="support-section">
+              <h4>Need Assistance?</h4>
+              <p className="support-contact">
+                <span className="support-icon">📞</span>
+                <strong>+91 88979 78545</strong>
+              </p>
+              <p className="support-email">
+                <span className="support-icon">✉️</span>
+                missammabeautyparlour@gmail.com
+              </p>
+            </div>
+          </div>
           
-          <button
-            onClick={() => {
-              console.log("🛒 Current cart:", cart);
-              console.log("📝 Current billing:", billing);
-              console.log("🔑 Token:", getToken()?.substring(0, 30) + "...");
-            }}
-            style={{
-              padding: "0.5rem 1rem",
-              background: "#f8f9fa",
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              cursor: "pointer"
-            }}
-          >
-            Log Current State
-          </button>
-        </div>
-        
-        <div style={{ marginTop: "1rem", fontSize: "0.8rem", color: "#666" }}>
-          <p><strong>Status:</strong> The 500 error is a server-side issue. Frontend is working correctly.</p>
-          <p><strong>Next Step:</strong> Contact backend developer with console error details.</p>
         </div>
       </div>
     </div>
   );
 };
-
-// Add CSS animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-`;
-document.head.appendChild(style);
 
 export default Checkout;

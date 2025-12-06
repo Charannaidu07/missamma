@@ -1,5 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import goldpearlsetImg from "../assets/gold-pearl-set.jpg";
+import diamondearringsImg from "../assets/diamond-earrings.jpg";
+import braceletsetImg from "../assets/bracelet-set.jpg";
+import hairstylingImg from "../assets/hair-styling.jpg";
+import bridalmakeupImg from "../assets/bridal-makeup.jpg";
+import hairspaImg from "../assets/hair-spa.jpg";
+
+
 
 const Footer = () => {
   const [hoveredLink, setHoveredLink] = useState(null);
@@ -42,56 +50,126 @@ const Footer = () => {
 
   // Handle Instagram redirect
   const handleOpenInstagram = () => {
-    // Replace with your actual Instagram URL
     const instagramUrl = "https://www.instagram.com/missamma_beautyparlour?igsh=MXUxOTI2NzBsMTM1dg==";
     window.open(instagramUrl, '_blank');
   };
 
-  // Sample products data
+  // Sample products data with imported images
   const featuredProducts = [
     {
       id: 1,
       name: "Gold Pearl Necklace",
-      price: "₹199",
-      image: "💎",
-      category: "Jewelry"
+      price: "Starting From ₹199",
+      image: goldpearlsetImg, // Use imported image
+      category: "Jewelry",
+      alt: "Gold Pearl Necklace Set"
     },
     {
       id: 2,
-      name: "Bridal Makeup Package",
-      price: "₹299",
-      image: "💄",
-      category: "Beauty"
+      name: "Bridal Makeup",
+      price: "Starting From ₹299",
+      image: bridalmakeupImg, // Use imported image
+      category: "Beauty",
+      alt: "Bridal Makeup Service"
     },
     {
       id: 3,
       name: "Diamond Earrings",
-      price: "₹159",
-      image: "✨",
-      category: "Jewelry"
+      price: "Starting From ₹159",
+      image: diamondearringsImg, // Use imported image or placeholder
+      category: "Jewelry",
+      alt: "Diamond Earrings"
     },
     {
       id: 4,
-      name: "Spa Day Package",
-      price: "₹179",
-      image: "🛁",
-      category: "Wellness"
+      name: "Hair Spa",
+      price: "Starting From ₹179",
+      image: hairspaImg, // Use imported image or placeholder
+      category: "Wellness",
+      alt: "Spa Day Package"
     },
     {
       id: 5,
       name: "Silver Bracelet Set",
-      price: "₹129",
-      image: "📿",
-      category: "Jewelry"
+      price: "Starting From ₹129",
+      image: braceletsetImg, // Use imported image or placeholder
+      category: "Jewelry",
+      alt: "Silver Bracelet Set"
     },
     {
       id: 6,
       name: "Hair Styling Session",
-      price: "₹89",
-      image: "💇‍♀️",
-      category: "Beauty"
+      price: "Starting From ₹89",
+      image: hairstylingImg, // Use imported image or placeholder
+      category: "Beauty",
+      alt: "Hair Styling Service"
     }
   ];
+
+  // Helper function to render images with fallback
+  const renderProductImage = (imageSrc, alt, category) => {
+    if (imageSrc) {
+      return (
+        <img 
+          src={imageSrc} 
+          alt={alt}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            borderRadius: "8px",
+          }}
+          onError={(e) => {
+            // If image fails to load, replace with placeholder
+            e.target.style.display = 'none';
+            const parent = e.target.parentElement;
+            parent.innerHTML = renderProductPlaceholder(category);
+          }}
+        />
+      );
+    }
+    return renderProductPlaceholder(category);
+  };
+
+  // Helper function to render placeholder
+  const renderProductPlaceholder = (category) => {
+    const placeholderStyle = {
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "2.5rem", // Increased font size
+      borderRadius: "8px",
+    };
+
+    if (category === "Jewelry") {
+      return (
+        <div style={{...placeholderStyle, background: "linear-gradient(135deg, #ffecb3 0%, #ffd54f 100%)"}}>
+          💎
+        </div>
+      );
+    } else if (category === "Beauty") {
+      return (
+        <div style={{...placeholderStyle, background: "linear-gradient(135deg, #ffd6e7 0%, #ffafcc 100%)"}}>
+          💄
+        </div>
+      );
+    } else if (category === "Wellness") {
+      return (
+        <div style={{...placeholderStyle, background: "linear-gradient(135deg, #c9f7ff 0%, #81deea 100%)"}}>
+          🛁
+        </div>
+      );
+    } else {
+      return (
+        <div style={{...placeholderStyle, background: "linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%)"}}>
+          ✨
+        </div>
+      );
+    }
+  };
 
   return (
     <footer style={styles.footer}>
@@ -99,7 +177,7 @@ const Footer = () => {
         {/* Banner Section - Replacing Newsletter */}
         <div style={styles.bannerSection}>
           <div style={styles.bannerHeader}>
-            <h4 style={styles.bannerTitle}></h4>
+            <h4 style={styles.bannerTitle}>Featured Products & Services</h4>
           </div>
           
           <div style={styles.bannerContainer}>
@@ -110,7 +188,20 @@ const Footer = () => {
                 <p style={styles.appointmentText}>
                   Ready for a transformation? Book your beauty session today!
                 </p>
-                <Link to="/booking" style={styles.appointmentButton}>
+                <Link 
+                  to="/booking" 
+                  style={styles.appointmentButton}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#ffffff';
+                    e.target.style.color = '#e84393';
+                    e.target.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#ffffff';
+                    e.target.style.color = '#e84393';
+                    e.target.style.transform = 'translateY(0)';
+                  }}
+                >
                   Book Now
                 </Link>
               </div>
@@ -119,15 +210,52 @@ const Footer = () => {
 
             {/* Featured Products */}
             {featuredProducts.map((product) => (
-              <div key={product.id} style={styles.productCard}>
+              <div 
+                key={product.id} 
+                style={styles.productCard}
+                onMouseEnter={(e) => {
+                  if (window.innerWidth > 768) {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (window.innerWidth > 768) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }
+                }}
+              >
                 <div style={styles.productImage}>
-                  {product.image}
+                  {renderProductImage(product.image, product.alt, product.category)}
                 </div>
                 <div style={styles.productInfo}>
-                  <span style={styles.productCategory}>{product.category}</span>
+                  <span style={{
+                    ...styles.productCategory,
+                    background: product.category === "Jewelry" 
+                      ? 'linear-gradient(135deg, #FFD700, #FFA500)' 
+                      : product.category === "Beauty"
+                      ? 'linear-gradient(135deg, #e84393, #fd79a8)'
+                      : 'linear-gradient(135deg, #00b4db, #0083b0)'
+                  }}>
+                    {product.category}
+                  </span>
                   <h6 style={styles.productName}>{product.name}</h6>
                   <div style={styles.productPrice}>{product.price}</div>
-                  <Link to="/store" style={styles.viewProductButton}>
+                  <Link 
+                    to="/store" 
+                    style={styles.viewProductButton}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#e84393';
+                      e.target.style.color = 'white';
+                      e.target.style.borderColor = '#e84393';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'transparent';
+                      e.target.style.color = '#bdc3c7';
+                      e.target.style.borderColor = '#4a6278';
+                    }}
+                  >
                     View Product
                   </Link>
                 </div>
@@ -146,7 +274,6 @@ const Footer = () => {
               and professional beauty consultations. Experience the perfect blend of 
               elegance and wellness.
             </p>
-        
             
             {/* Instagram Button */}
             <div style={styles.instagramSection}>
@@ -371,9 +498,9 @@ const styles = {
     fontSize: '3rem',
     marginLeft: '1rem',
   },
-  // Product Card
+  // Product Card - UPDATED WITH LARGER IMAGES
   productCard: {
-    minWidth: '250px',
+    minWidth: '280px', // Increased from 250px
     background: '#34495e',
     borderRadius: '12px',
     padding: '1.5rem',
@@ -383,45 +510,72 @@ const styles = {
     textAlign: 'center',
     transition: 'all 0.3s ease',
     flexShrink: 0,
+    position: 'relative',
+    overflow: 'hidden',
   },
   productImage: {
-    fontSize: '3rem',
-    marginBottom: '1rem',
+    width: '180px', // Increased from 120px - LARGER IMAGE
+    height: '180px', // Increased from 120px - LARGER IMAGE
+    marginBottom: '1.5rem', // Increased margin
+    borderRadius: '12px', // Slightly larger radius
+    overflow: 'hidden',
+    position: 'relative',
+    backgroundColor: '#2c3e50',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.2)', // Added shadow for depth
   },
   productInfo: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.5rem',
+    gap: '0.75rem', // Increased gap
+    width: '100%',
   },
   productCategory: {
-    fontSize: '0.8rem',
-    color: '#e84393',
+    fontSize: '0.8rem', // Slightly larger
+    color: 'white',
     fontWeight: '600',
     textTransform: 'uppercase',
+    padding: '0.35rem 0.9rem', // Slightly larger padding
+    borderRadius: '15px', // Larger radius
+    display: 'inline-block',
+    marginBottom: '0.5rem',
+    alignSelf: 'center', // Center align
+    textAlign: 'center',
+    minWidth: '80px',
   },
   productName: {
-    fontSize: '1rem',
+    fontSize: '1.1rem', // Increased from 1rem
     fontWeight: '600',
     margin: '0.5rem 0',
     color: '#ecf0f1',
+    height: '2.8rem', // Slightly taller
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    lineHeight: '1.4', // Better line height
   },
   productPrice: {
-    fontSize: '1.1rem',
+    fontSize: '1.2rem', // Increased from 1.1rem
     fontWeight: '700',
     color: '#e84393',
     margin: '0.5rem 0',
+    textShadow: '0 1px 2px rgba(0,0,0,0.2)',
   },
   viewProductButton: {
     background: 'transparent',
     color: '#bdc3c7',
     border: '1px solid #4a6278',
-    padding: '0.5rem 1rem',
-    borderRadius: '20px',
+    padding: '0.6rem 1.2rem', // Slightly larger
+    borderRadius: '25px', // Larger radius
     textDecoration: 'none',
-    fontSize: '0.8rem',
+    fontSize: '0.85rem', // Slightly larger
     transition: 'all 0.3s ease',
     marginTop: 'auto',
+    width: '100%',
+    textAlign: 'center',
+    fontWeight: '500',
   },
   // Instagram Button Styles
   instagramSection: {

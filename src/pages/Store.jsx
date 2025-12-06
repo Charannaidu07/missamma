@@ -3,7 +3,7 @@ import { api } from "../api";
 import { Link } from "react-router-dom";
 
 const BACKEND_BASE =
-  import.meta.env.VITE_BACKEND_BASE || "https://missamma.centralindia.cloudapp.azure.com";
+  import.meta.env.VITE_BACKEND_BASE || "https://missammabackend.onrender.com";
 
 const Store = () => {
   const [products, setProducts] = useState([]);
@@ -34,23 +34,29 @@ const Store = () => {
     fetchProducts();
   }, []);
 
-  const getImageUrl = (product) => {
-  if (product.image) {
-    return product.image;
-  }
-  return getPlaceholderSvg(product.name);
-};
+  const getPlaceholderSvg = (productName = "Product") => {
+    return `data:image/svg+xml;base64,${btoa(`
+      <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#ff9a9e"/>
+        <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">${productName}</text>
+        <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">No Image Available</text>
+      </svg>
+    `)}`;
+  };
 
-const getPlaceholderSvg = (productName = "Product") => {
-  const svgContent = `
-    <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#ff9a9e"/>
-      <text x="50%" y="45%" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle">${productName}</text>
-      <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="middle">No Image Available</text>
-    </svg>
-  `;
-  return `data:image/svg+xml;base64,${btoa(svgContent)}`;
-};
+  const getImageUrl = (product) => {
+    if (product.image_url) {
+      return product.image_url.startsWith("http")
+        ? product.image_url
+        : `${BACKEND_BASE}${product.image_url}`;
+    }
+    if (product.image) {
+      return product.image.startsWith("http")
+        ? product.image
+        : `${BACKEND_BASE}${product.image}`;
+    }
+    return getPlaceholderSvg(product.name);
+  };
 
   const updateLocalStorage = (newQuantities) => {
     let cart = [];
@@ -153,19 +159,14 @@ const getPlaceholderSvg = (productName = "Product") => {
               >
                 {/* Product Image */}
                 <div style={styles.imageContainer}>
-<img
-  src={getImageUrl(product)}
-  alt={product.name}
-  style={styles.productImage}
-  onError={(e) => {
-    console.error("Image failed to load:", e.target.src);
-    console.log("Product data:", product);
-    e.target.src = getPlaceholderSvg(product.name);
-  }}
-  onLoad={(e) => {
-    console.log("Image loaded successfully:", e.target.src);
-  }}
-/>
+                  <img
+                    src={getImageUrl(product)}
+                    alt={product.name}
+                    style={styles.productImage}
+                    onError={(e) => {
+                      e.target.src = getPlaceholderSvg(product.name);
+                    }}
+                  />
                   <div style={styles.stockBadge}>
                     {product.stock} available
                   </div>
@@ -352,7 +353,7 @@ const getPlaceholderSvg = (productName = "Product") => {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    
     padding: '2rem 1rem',
     display: 'flex',
     justifyContent: 'center',

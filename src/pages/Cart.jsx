@@ -58,11 +58,11 @@ const Cart = () => {
               style={styles.clearButton}
               onMouseEnter={(e) => {
                 e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 6px 20px rgba(232, 67, 147, 0.4)';
+                e.target.style.boxShadow = '0 6px 20px rgba(255, 107, 139, 0.4)';
               }}
               onMouseLeave={(e) => {
                 e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 15px rgba(232, 67, 147, 0.3)';
+                e.target.style.boxShadow = '0 4px 15px rgba(255, 107, 139, 0.3)';
               }}
             >
               🗑️ Clear Cart
@@ -84,11 +84,11 @@ const Cart = () => {
                   style={styles.primaryButton}
                   onMouseEnter={(e) => {
                     e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 8px 25px rgba(255, 215, 0, 0.4)';
+                    e.target.style.boxShadow = '0 8px 25px rgba(255, 107, 139, 0.4)';
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 15px rgba(255, 215, 0, 0.3)';
+                    e.target.style.boxShadow = '0 4px 15px rgba(255, 107, 139, 0.3)';
                   }}
                 >
                   💎 Shop Jewelry
@@ -99,11 +99,11 @@ const Cart = () => {
                   style={styles.secondaryButton}
                   onMouseEnter={(e) => {
                     e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 8px 25px rgba(232, 67, 147, 0.4)';
+                    e.target.style.boxShadow = '0 8px 25px rgba(255, 107, 139, 0.4)';
                   }}
                   onMouseLeave={(e) => {
                     e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 15px rgba(232, 67, 147, 0.3)';
+                    e.target.style.boxShadow = '0 4px 15px rgba(255, 107, 139, 0.3)';
                   }}
                 >
                   💄 Book Services
@@ -174,12 +174,14 @@ const Cart = () => {
                       onClick={() => removeItem(idx)}
                       style={styles.removeButton}
                       onMouseEnter={(e) => {
-                        e.target.style.background = 'linear-gradient(135deg, #e84393, #fd79a8)';
+                        e.target.style.background = 'linear-gradient(135deg, #FF6B8B, #FD79A8)';
                         e.target.style.transform = 'translateY(-1px)';
+                        e.target.style.color = 'white';
                       }}
                       onMouseLeave={(e) => {
                         e.target.style.background = 'transparent';
                         e.target.style.transform = 'translateY(0)';
+                        e.target.style.color = '#FF6B8B';
                       }}
                     >
                       Remove
@@ -221,11 +223,11 @@ const Cart = () => {
                     style={styles.checkoutButton}
                     onMouseEnter={(e) => {
                       e.target.style.transform = 'translateY(-2px)';
-                      e.target.style.boxShadow = '0 8px 25px rgba(232, 67, 147, 0.4)';
+                      e.target.style.boxShadow = '0 8px 25px rgba(255, 107, 139, 0.4)';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = '0 4px 15px rgba(232, 67, 147, 0.3)';
+                      e.target.style.boxShadow = '0 4px 15px rgba(255, 107, 139, 0.3)';
                     }}
                   >
                     🚀 Proceed to Checkout
@@ -235,13 +237,13 @@ const Cart = () => {
                   <button 
                     style={styles.continueShoppingButton}
                     onMouseEnter={(e) => {
-                      e.target.style.background = '#e84393';
+                      e.target.style.background = '#FF6B8B';
                       e.target.style.color = 'white';
                       e.target.style.transform = 'translateY(-2px)';
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.background = 'transparent';
-                      e.target.style.color = '#e84393';
+                      e.target.style.color = '#FF6B8B';
                       e.target.style.transform = 'translateY(0)';
                     }}
                   >
@@ -276,7 +278,7 @@ const Cart = () => {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+   
     padding: '2rem 1rem',
     display: 'flex',
     justifyContent: 'center',
@@ -286,22 +288,24 @@ const styles = {
     background: 'white',
     borderRadius: '25px',
     padding: '2.5rem',
-    boxShadow: '0 25px 50px rgba(0,0,0,0.15)',
+    boxShadow: '0 25px 50px rgba(255, 107, 139, 0.15)',
     width: '100%',
     maxWidth: '900px',
     minHeight: '600px',
-    border: '1px solid rgba(255,255,255,0.2)',
+    border: '1px solid rgba(255, 198, 224, 0.3)',
+    marginTop: '2rem',
+    marginBottom: '2rem',
   },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: '2rem',
-    borderBottom: '2px solid #f8f9fa',
+    borderBottom: '2px solid #FFE4E9',
     paddingBottom: '1.5rem',
   },
   badge: {
-    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
+    background: 'linear-gradient(135deg, #FF6B8B, #FF8E9E)',
     color: 'white',
     padding: '0.4rem 1rem',
     borderRadius: '20px',
@@ -309,6 +313,7 @@ const styles = {
     fontWeight: '600',
     marginBottom: '0.5rem',
     display: 'inline-block',
+    boxShadow: '0 4px 10px rgba(255, 107, 139, 0.2)',
   },
   titleSection: {
     display: 'flex',
@@ -320,7 +325,7 @@ const styles = {
     color: '#2c3e50',
     fontSize: '2.2rem',
     fontWeight: '800',
-    background: 'linear-gradient(135deg, #e84393 0%, #fd79a8 100%)',
+    background: 'linear-gradient(135deg, #FF6B8B 0%, #FF8E9E 100%)',
     backgroundClip: 'text',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
@@ -331,7 +336,7 @@ const styles = {
     fontWeight: '500',
   },
   clearButton: {
-    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
+    background: 'linear-gradient(135deg, #FF6B8B, #FF8E9E)',
     color: 'white',
     border: 'none',
     padding: '0.8rem 1.5rem',
@@ -340,7 +345,7 @@ const styles = {
     fontWeight: '600',
     fontSize: '0.9rem',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(232, 67, 147, 0.3)',
+    boxShadow: '0 4px 15px rgba(255, 107, 139, 0.3)',
   },
   emptyState: {
     textAlign: 'center',
@@ -356,16 +361,12 @@ const styles = {
     fontSize: '2rem',
     fontWeight: '700',
     margin: '0 0 1rem 0',
-    color: '#2c3e50',
-    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
-    backgroundClip: 'text',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
+    color: '#FF6B8B',
   },
   emptyText: {
     margin: '0 0 2.5rem 0',
     fontSize: '1.1rem',
-    color: '#7f8c8d',
+    color: '#666',
     maxWidth: '400px',
     marginLeft: 'auto',
     marginRight: 'auto',
@@ -378,28 +379,28 @@ const styles = {
     flexWrap: 'wrap',
   },
   primaryButton: {
-    background: 'linear-gradient(135deg, #FFD700, #FFA500)',
+    background: 'linear-gradient(135deg, #FF6B8B, #FF8E9E)',
     color: 'white',
     border: 'none',
     padding: '1.2rem 2rem',
-    borderRadius: '50px',
+    borderRadius: '12px',
     fontSize: '1.1rem',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(255, 215, 0, 0.3)',
+    boxShadow: '0 4px 15px rgba(255, 107, 139, 0.3)',
   },
   secondaryButton: {
-    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
-    color: 'white',
-    border: 'none',
+    background: 'linear-gradient(135deg, #FFB6C1, #FFCAD4)',
+    color: '#FF6B8B',
+    border: '2px solid #FF6B8B',
     padding: '1.2rem 2rem',
-    borderRadius: '50px',
+    borderRadius: '12px',
     fontSize: '1.1rem',
     fontWeight: '600',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(232, 67, 147, 0.3)',
+    boxShadow: '0 4px 15px rgba(255, 107, 139, 0.1)',
   },
   itemsContainer: {
     marginBottom: '2.5rem',
@@ -413,17 +414,18 @@ const styles = {
     alignItems: 'center',
     gap: '1.5rem',
     padding: '1.5rem',
-    border: '2px solid #f7fafc',
+    border: '2px solid #FFE4E9',
     borderRadius: '20px',
     marginBottom: '1rem',
-    background: 'white',
+    background: 'linear-gradient(135deg, #FFF9FA 0%, #FFF5F6 100%)',
     transition: 'all 0.3s ease',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+    boxShadow: '0 2px 10px rgba(255, 107, 139, 0.05)',
   },
   cartItemHover: {
     transform: 'translateY(-2px)',
-    boxShadow: '0 8px 25px rgba(232, 67, 147, 0.15)',
-    borderColor: '#e84393',
+    boxShadow: '0 8px 25px rgba(255, 107, 139, 0.15)',
+    borderColor: '#FF6B8B',
+    background: 'linear-gradient(135deg, #FFF5F6 0%, #FFF0F3 100%)',
   },
   itemImage: {
     width: '80px',
@@ -434,12 +436,13 @@ const styles = {
   imagePlaceholder: {
     width: '100%',
     height: '100%',
-    background: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+    background: 'linear-gradient(135deg, #FFCAD4 0%, #FFB6C1 100%)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '2rem',
     borderRadius: '15px',
+    color: '#FF6B8B',
   },
   itemInfo: {
     minWidth: 0,
@@ -448,7 +451,7 @@ const styles = {
     margin: '0 0 0.5rem 0',
     fontSize: '1.3rem',
     fontWeight: '700',
-    color: '#2c3e50',
+    color: '#333',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -456,7 +459,7 @@ const styles = {
   itemDescription: {
     margin: '0 0 0.5rem 0',
     fontSize: '0.9rem',
-    color: '#7f8c8d',
+    color: '#666',
     lineHeight: '1.4',
   },
   itemMeta: {
@@ -465,16 +468,16 @@ const styles = {
     alignItems: 'center',
   },
   itemCategory: {
-    background: '#f8f9fa',
+    background: 'rgba(255, 107, 139, 0.1)',
     padding: '0.3rem 0.8rem',
     borderRadius: '12px',
     fontSize: '0.8rem',
     fontWeight: '600',
-    color: '#e84393',
+    color: '#FF6B8B',
   },
   itemPrice: {
     fontSize: '1rem',
-    color: '#7f8c8d',
+    color: '#666',
     fontWeight: '500',
   },
   quantitySection: {
@@ -486,10 +489,10 @@ const styles = {
   quantityControls: {
     display: 'flex',
     alignItems: 'center',
-    background: '#f8f9fa',
+    background: 'white',
     borderRadius: '15px',
     padding: '0.4rem',
-    border: '2px solid #e9ecef',
+    border: '2px solid #FFE4E9',
   },
   quantityButton: {
     background: 'white',
@@ -503,8 +506,8 @@ const styles = {
     cursor: 'pointer',
     fontSize: '1.3rem',
     fontWeight: '600',
-    color: '#e84393',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+    color: '#FF6B8B',
+    boxShadow: '0 2px 8px rgba(255, 107, 139, 0.1)',
     transition: 'all 0.2s ease',
   },
   disabledButton: {
@@ -517,7 +520,7 @@ const styles = {
     textAlign: 'center',
     fontWeight: '700',
     fontSize: '1.1rem',
-    color: '#2c3e50',
+    color: '#333',
   },
   itemTotal: {
     display: 'flex',
@@ -529,12 +532,12 @@ const styles = {
   totalPrice: {
     fontSize: '1.4rem',
     fontWeight: '800',
-    color: '#2c3e50',
+    color: '#FF6B8B',
   },
   removeButton: {
     background: 'transparent',
-    border: '2px solid #e84393',
-    color: '#e84393',
+    border: '2px solid #FF6B8B',
+    color: '#FF6B8B',
     padding: '0.5rem 1rem',
     borderRadius: '8px',
     cursor: 'pointer',
@@ -543,21 +546,21 @@ const styles = {
     transition: 'all 0.2s ease',
   },
   footer: {
-    borderTop: '3px solid #f8f9fa',
+    borderTop: '3px solid #FFE4E9',
     paddingTop: '2.5rem',
   },
   totalSection: {
-    background: 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
+    background: 'linear-gradient(135deg, #FFF9FA 0%, #FFF5F6 100%)',
     padding: '2rem',
     borderRadius: '20px',
     marginBottom: '2rem',
-    border: '2px solid #e9ecef',
+    border: '2px solid #FFE4E9',
   },
   summaryTitle: {
     margin: '0 0 1.5rem 0',
     fontSize: '1.5rem',
     fontWeight: '700',
-    color: '#2c3e50',
+    color: '#FF6B8B',
     textAlign: 'center',
   },
   totalRow: {
@@ -568,22 +571,22 @@ const styles = {
     fontSize: '1.1rem',
   },
   totalLabel: {
-    color: '#7f8c8d',
+    color: '#666',
     fontSize: '1rem',
     fontWeight: '500',
   },
   totalAmount: {
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#333',
   },
   shippingText: {
-    color: '#e84393',
+    color: '#FF6B8B',
     fontWeight: '700',
     fontSize: '1rem',
   },
   divider: {
     height: '2px',
-    background: 'linear-gradient(90deg, transparent 0%, #e84393 50%, transparent 100%)',
+    background: 'linear-gradient(90deg, transparent 0%, #FF6B8B 50%, transparent 100%)',
     margin: '1.5rem 0',
   },
   grandTotal: {
@@ -595,12 +598,12 @@ const styles = {
   grandTotalLabel: {
     fontSize: '1.3rem',
     fontWeight: '700',
-    color: '#2c3e50',
+    color: '#333',
   },
   grandTotalAmount: {
     fontSize: '1.8rem',
     fontWeight: '800',
-    color: '#e84393',
+    color: '#FF6B8B',
   },
   actionButtons: {
     display: 'flex',
@@ -610,7 +613,7 @@ const styles = {
   },
   checkoutButton: {
     flex: 1,
-    background: 'linear-gradient(135deg, #e84393, #fd79a8)',
+    background: 'linear-gradient(135deg, #FF6B8B, #FF8E9E)',
     color: 'white',
     border: 'none',
     padding: '1.5rem 2rem',
@@ -619,14 +622,14 @@ const styles = {
     fontWeight: '700',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    boxShadow: '0 4px 15px rgba(232, 67, 147, 0.3)',
+    boxShadow: '0 4px 15px rgba(255, 107, 139, 0.3)',
     minWidth: '250px',
   },
   continueShoppingButton: {
     flex: 1,
     background: 'transparent',
-    border: '3px solid #e84393',
-    color: '#e84393',
+    border: '3px solid #FF6B8B',
+    color: '#FF6B8B',
     padding: '1.5rem 2rem',
     borderRadius: '15px',
     fontSize: '1.1rem',
@@ -640,7 +643,7 @@ const styles = {
     gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
     gap: '1rem',
     padding: '1.5rem',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    background: 'linear-gradient(135deg, #FF6B8B 0%, #FF8E9E 100%)',
     borderRadius: '15px',
     color: 'white',
   },

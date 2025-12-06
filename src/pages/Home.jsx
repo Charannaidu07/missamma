@@ -1,14 +1,46 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+// Import images from assets folder
+import bridalMakeupImg from "../assets/bridal-makeup.png";
+import goldNecklaceImg from "../assets/gold-necklace.jpg";
+import facialTreatmentImg from "../assets/facial-treatment.jpg";
+import EarringsImg from "../assets/ear-rings.jpg";
+import workstationImg from "../assets/work-station.jpg";
+import receptionImg from "../assets/reception.png";
+import jewelleryGalleryImg from "../assets/jewellery-gallery.jpg";
+import necklaceSetImg from "../assets/necklace-set.jpg";
+import realearringImg from "../assets/real-Ear-rings.png";
+import hairtransformationImg from "../assets/hair-transformation.jpeg";
+import makeuptransformationImg from "../assets/makeup-transformation.png";
 const Home = () => {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  // Update window width on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Helper function to get responsive values
+  const getResponsiveValue = (values) => {
+    if (windowWidth < 480) return values.xs || values.sm || values.md || values.lg;
+    if (windowWidth < 768) return values.sm || values.md || values.lg;
+    if (windowWidth < 1024) return values.md || values.lg;
+    return values.lg;
+  };
+
   const featuredServices = [
     {
       id: 1,
       title: "Bridal Makeup",
       description: "Complete bridal makeup package with professional artists for your special day",
-      price: "₹299",
-      image: "/images/bridal-makeup.jpg",
+      price: "Starting From ₹2999",
+      image: bridalMakeupImg,
       category: "beauty",
       duration: "3-4 hours",
       alt: "Bridal Makeup Service"
@@ -17,18 +49,17 @@ const Home = () => {
       id: 2,
       title: "Gold Necklace Set",
       description: "Elegant gold necklace with matching earrings, perfect for weddings and special occasions",
-      price: "₹199",
-      image: "/images/gold-necklace.jpg",
+      price: "Starting From ₹599",
+      image: goldNecklaceImg, 
       category: "jewelry",
-      material: "1 Gram Gold",
       alt: "Gold Necklace Set"
     },
     {
       id: 3,
       title: "Facial & Skincare",
       description: "Professional facial treatment for glowing, rejuvenated skin",
-      price: "₹89",
-      image: "/images/facial-treatment.jpg",
+      price: "Starting From ₹399",
+      image: facialTreatmentImg,
       category: "beauty",
       duration: "1 hour",
       alt: "Facial Treatment"
@@ -37,112 +68,225 @@ const Home = () => {
       id: 4,
       title: "Ear Rings",
       description: "Sparkling studs that add elegance to any outfit",
-      price: "₹159",
-      image: "/images/diamond-earrings.jpg",
+      price: "Starting From ₹149",
+      image: EarringsImg,
       category: "jewelry",
-      material: "1 Gram Gold",
       alt: "Ear Rings"
     }
   ];
 
-  // Beauty Parlour Interior Images
   const interiorImages = [
     {
       id: 1,
       title: "Modern Workstations",
       description: "State-of-the-art beauty stations equipped with premium tools and equipment",
-      area: "Beauty Station"
+      area: "Beauty Station",
+      image: workstationImg
     },
     {
       id: 2,
       title: "Bridal Suite",
       description: "Specialized area for bridal makeup and pre-wedding services",
-      area: "Bridal Room"
+      area: "Bridal Room",
+      image: null
     },
     {
       id: 3,
       title: "Jewelry Gallery",
       description: "Elegant display of our exclusive jewelry collections",
-      area: "Jewelry Section"
+      area: "Jewelry Section",
+      image: jewelleryGalleryImg 
     },
     {
       id: 4,
-      title: "Waiting Lounge",
+      title: "Reception",
       description: "Comfortable waiting area with premium amenities for our clients",
-      area: "Reception"
+      area: "Reception",
+      image: receptionImg
     }
   ];
 
-  // Best Works Gallery
   const bestWorks = [
     {
       id: 1,
       title: "Bridal Makeup Transformation",
       description: "Complete bridal look with traditional jewelry",
       category: "Bridal",
-      beforeAfter: true
+      beforeAfter: true,
+      image: makeuptransformationImg
     },
     {
       id: 2,
       title: "Evening Party Makeup",
       description: "Glamorous look for special occasions",
       category: "Party Makeup",
-      beforeAfter: false
+      beforeAfter: false,
+      image: null
     },
     {
       id: 3,
       title: "Gold Necklace Set",
       description: "Traditional gold jewelry for weddings",
       category: "Jewelry",
-      beforeAfter: false
+      beforeAfter: false,
+      image: necklaceSetImg
     },
     {
       id: 4,
       title: "Facial Glow Up",
       description: "Skin transformation with premium facial",
       category: "Skincare",
-      beforeAfter: true
+      beforeAfter: true,
+      image: null
     },
     {
       id: 5,
       title: "Hair Styling Makeover",
       description: "Professional hair styling for events",
       category: "Hair",
-      beforeAfter: true
+      beforeAfter: true,
+      image: hairtransformationImg
     },
     {
       id: 6,
       title: "Ear Rings Collection",
       description: "Beautiful ear jewelry designs",
       category: "Jewelry",
-      beforeAfter: false
+      beforeAfter: false,
+      image: realearringImg
     }
   ];
 
+  // Helper function to render images with fallback
+  const renderImage = (imageSrc, alt, category, isBeforeAfter = false) => {
+    if (imageSrc) {
+      return (
+        <img 
+          src={imageSrc} 
+          alt={alt}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            display: "block",
+          }}
+          loading="lazy"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            const parent = e.target.parentElement;
+            parent.innerHTML = renderPlaceholder(category, isBeforeAfter);
+          }}
+        />
+      );
+    }
+    return renderPlaceholder(category, isBeforeAfter);
+  };
+
+  const renderPlaceholder = (category, isBeforeAfter = false) => {
+    const placeholderSize = getResponsiveValue({
+      xs: "2rem",
+      sm: "2.5rem",
+      md: "3rem",
+      lg: "3.5rem"
+    });
+
+    const placeholderStyle = {
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: placeholderSize,
+      color: "#333",
+      flexDirection: "column",
+      gap: "0.5rem",
+    };
+
+    if (category === "beauty" || category === "Bridal" || category === "Party Makeup" || category === "Skincare" || category === "Hair") {
+      if (isBeforeAfter) {
+        return (
+          <div style={{...placeholderStyle, background: "linear-gradient(135deg, #ffd6e7 0%, #ffafcc 100%)"}}>
+            <div style={{ fontSize: "0.9rem" }}>Before</div>
+            <div style={{ fontSize: "1.2rem" }}>→</div>
+            <div style={{ fontSize: "0.9rem" }}>After</div>
+          </div>
+        );
+      }
+      return (
+        <div style={{...placeholderStyle, background: "linear-gradient(135deg, #ffd6e7 0%, #ffafcc 100%)"}}>
+          💄
+        </div>
+      );
+    } else if (category === "jewelry" || category === "Jewelry") {
+      return (
+        <div style={{...placeholderStyle, background: "linear-gradient(135deg, #ffecb3 0%, #ffd54f 100%)"}}>
+          💎
+        </div>
+      );
+    } else {
+      return (
+        <div style={{...placeholderStyle, background: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)"}}>
+          ✨
+        </div>
+      );
+    }
+  };
+
+  // Get responsive image height
+  const getImageHeight = () => {
+    if (windowWidth < 480) return "220px";
+    if (windowWidth < 768) return "250px";
+    if (windowWidth < 1024) return "280px";
+    return "300px";
+  };
+
+  // Get responsive grid columns
+  const getGridColumns = () => {
+    if (windowWidth < 768) return "1fr";
+    if (windowWidth < 1024) return "repeat(2, 1fr)";
+    return "repeat(4, 1fr)";
+  };
+
+  const getInteriorGridColumns = () => {
+    if (windowWidth < 768) return "1fr";
+    if (windowWidth < 1024) return "repeat(2, 1fr)";
+    return "repeat(4, 1fr)";
+  };
+
+  const getBestWorksGridColumns = () => {
+    if (windowWidth < 768) return "1fr";
+    if (windowWidth < 1024) return "repeat(2, 1fr)";
+    return "repeat(3, 1fr)";
+  };
+
   return (
-    <div style={{ display: "grid", gap: "1.8rem" }}>
+    <div style={{ display: "grid", gap: getResponsiveValue({ xs: "1.2rem", sm: "1.5rem", md: "1.8rem", lg: "2rem" }) }}>
       {/* Hero Section */}
       <section
         className="card"
         style={{
           display: "grid",
-          gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "minmax(0,2fr) minmax(0,1.4fr)",
-          gap: window.innerWidth < 768 ? "1.5rem" : "2rem",
+          gridTemplateColumns: windowWidth < 768 ? "1fr" : "minmax(0,2fr) minmax(0,1.4fr)",
+          gap: getResponsiveValue({ xs: "1.2rem", sm: "1.5rem", md: "1.8rem", lg: "2rem" }),
           alignItems: "center",
+          padding: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem" }),
         }}
       >
         <div>
           <span className="badge-soft">Premium Beauty & Bespoke Jewelry</span>
           <h1 style={{ 
-            fontSize: window.innerWidth < 768 ? "1.8rem" : window.innerWidth < 480 ? "2rem" : "2.4rem", 
+            fontSize: getResponsiveValue({ xs: "1.5rem", sm: "1.8rem", md: "2rem", lg: "2.4rem" }), 
             marginTop: "1rem", 
-            marginBottom: "0.6rem"
+            marginBottom: "0.6rem",
+            lineHeight: 1.2
           }}>
             24/7 Online Booking & Jewelry Shopping
           </h1>
           <p style={{ 
-            fontSize: window.innerWidth < 768 ? "0.9rem" : "0.95rem", 
-            opacity: 0.9
+            fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1rem" }), 
+            opacity: 0.9,
+            lineHeight: 1.6
           }}>
             Book your beauty appointments in seconds and explore handpicked,
             bespoke jewelry from Missamma Beauty Parlour. No calls, no waiting — just
@@ -152,33 +296,41 @@ const Home = () => {
             display: "flex", 
             gap: "0.8rem", 
             marginTop: "1.2rem",
-            flexDirection: window.innerWidth < 768 ? "column" : "row"
+            flexDirection: windowWidth < 768 ? "column" : "row"
           }}>
-            <Link to="/booking" style={{ flex: window.innerWidth < 768 ? "none" : 1, width: window.innerWidth < 768 ? "100%" : "auto" }}>
-              <button className="btn-primary" style={{ width: window.innerWidth < 768 ? "100%" : "auto" }}>
+            <Link to="/booking" style={{ flex: windowWidth < 768 ? "none" : 1, width: windowWidth < 768 ? "100%" : "auto" }}>
+              <button 
+                className="btn-primary" 
+                style={{ 
+                  width: windowWidth < 768 ? "100%" : "auto",
+                  padding: getResponsiveValue({ xs: "0.7rem 1rem", sm: "0.8rem 1.2rem", md: "0.9rem 1.4rem", lg: "1rem 1.5rem" }),
+                  fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1rem" })
+                }}
+              >
                 Book an Appointment
               </button>
             </Link>
-            <Link to="/store" style={{ flex: window.innerWidth < 768 ? "none" : 1, width: window.innerWidth < 768 ? "100%" : "auto" }}>
+            <Link to="/store" style={{ flex: windowWidth < 768 ? "none" : 1, width: windowWidth < 768 ? "100%" : "auto" }}>
               <button
                 style={{
-                  padding: window.innerWidth < 768 ? "0.6rem 1.2rem" : "0.7rem 1.4rem",
+                  padding: getResponsiveValue({ xs: "0.7rem 1rem", sm: "0.8rem 1.2rem", md: "0.9rem 1.4rem", lg: "1rem 1.5rem" }),
                   borderRadius: 999,
                   border: "1px solid var(--primary-green)",
                   background: "white",
                   cursor: "pointer",
                   fontWeight: 600,
-                  width: window.innerWidth < 768 ? "100%" : "auto",
+                  width: windowWidth < 768 ? "100%" : "auto",
                   transition: "all 0.2s ease",
+                  fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1rem" })
                 }}
                 onMouseEnter={(e) => {
-                  if (window.innerWidth > 768) {
+                  if (windowWidth > 768) {
                     e.target.style.background = "var(--primary-green)";
                     e.target.style.color = "white";
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (window.innerWidth > 768) {
+                  if (windowWidth > 768) {
                     e.target.style.background = "white";
                     e.target.style.color = "var(--text-dark)";
                   }
@@ -192,22 +344,22 @@ const Home = () => {
         
         {/* Hero Image */}
         <div style={{
-          height: window.innerWidth < 768 ? 200 : 250,
+          height: getResponsiveValue({ xs: "180px", sm: "200px", md: "230px", lg: "250px" }),
           borderRadius: 25,
           background: "radial-gradient(circle at top, rgba(255,204,230,0.9), rgba(129,199,132,0.7))",
           position: "relative",
           overflow: "hidden",
-          order: window.innerWidth < 768 ? -1 : "unset"
+          order: windowWidth < 768 ? -1 : "unset"
         }}>
           <div
             style={{
               position: "absolute",
-              bottom: window.innerWidth < 480 ? 10 : 16,
-              left: window.innerWidth < 480 ? 10 : 16,
+              bottom: getResponsiveValue({ xs: "8px", sm: "12px", md: "14px", lg: "16px" }),
+              left: getResponsiveValue({ xs: "8px", sm: "12px", md: "14px", lg: "16px" }),
               background: "rgba(255,255,255,0.9)",
               borderRadius: 20,
-              padding: window.innerWidth < 480 ? "0.5rem 0.8rem" : "0.7rem 1rem",
-              fontSize: window.innerWidth < 480 ? "0.7rem" : "0.8rem",
+              padding: getResponsiveValue({ xs: "0.4rem 0.6rem", sm: "0.5rem 0.8rem", md: "0.6rem 1rem", lg: "0.7rem 1rem" }),
+              fontSize: getResponsiveValue({ xs: "0.65rem", sm: "0.7rem", md: "0.75rem", lg: "0.8rem" }),
             }}
           >
             ✅ Live slots, instant confirmation
@@ -215,12 +367,12 @@ const Home = () => {
           <div
             style={{
               position: "absolute",
-              top: window.innerWidth < 480 ? 10 : 16,
-              right: window.innerWidth < 480 ? 10 : 16,
+              top: getResponsiveValue({ xs: "8px", sm: "12px", md: "14px", lg: "16px" }),
+              right: getResponsiveValue({ xs: "8px", sm: "12px", md: "14px", lg: "16px" }),
               background: "rgba(255,255,255,0.9)",
               borderRadius: 20,
-              padding: window.innerWidth < 480 ? "0.5rem 0.8rem" : "0.7rem 1rem",
-              fontSize: window.innerWidth < 480 ? "0.7rem" : "0.8rem",
+              padding: getResponsiveValue({ xs: "0.4rem 0.6rem", sm: "0.5rem 0.8rem", md: "0.6rem 1rem", lg: "0.7rem 1rem" }),
+              fontSize: getResponsiveValue({ xs: "0.65rem", sm: "0.7rem", md: "0.75rem", lg: "0.8rem" }),
             }}
           >
             💳 Secure Razorpay checkout
@@ -229,23 +381,23 @@ const Home = () => {
       </section>
 
       {/* Featured Services Section */}
-      <section className="card">
+      <section className="card" style={{ padding: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem" }) }}>
         <div style={{ 
           textAlign: "center", 
-          marginBottom: window.innerWidth < 768 ? "1.5rem" : "2rem"
+          marginBottom: getResponsiveValue({ xs: "1.2rem", sm: "1.5rem", md: "1.8rem", lg: "2rem" })
         }}>
           <h2 style={{ 
-            fontSize: window.innerWidth < 768 ? "1.7rem" : window.innerWidth < 480 ? "1.5rem" : "2rem", 
+            fontSize: getResponsiveValue({ xs: "1.4rem", sm: "1.6rem", md: "1.8rem", lg: "2rem" }), 
             marginBottom: "0.5rem"
           }}>
             Featured Services & Products
           </h2>
           <p style={{ 
-            fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem", 
+            fontSize: getResponsiveValue({ xs: "0.8rem", sm: "0.85rem", md: "0.9rem", lg: "1rem" }), 
             opacity: 0.8, 
             maxWidth: "600px", 
             margin: "0 auto",
-            padding: window.innerWidth < 768 ? "0 1rem" : "0"
+            padding: windowWidth < 768 ? "0 1rem" : "0"
           }}>
             Discover our most popular beauty services and exquisite jewelry collections
           </p>
@@ -255,8 +407,8 @@ const Home = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: window.innerWidth < 768 ? "1rem" : "2rem",
+            gridTemplateColumns: getGridColumns(),
+            gap: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem" }),
             marginBottom: "3rem",
           }}
         >
@@ -276,13 +428,13 @@ const Home = () => {
                 overflow: "hidden",
               }}
               onMouseEnter={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.currentTarget.style.transform = "translateY(-8px)";
                   e.currentTarget.style.boxShadow = "0 15px 35px rgba(0,0,0,0.15)";
                 }
               }}
               onMouseLeave={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "none";
                 }
@@ -291,34 +443,14 @@ const Home = () => {
               {/* Service Image */}
               <div
                 style={{
-                  height: window.innerWidth < 768 ? "180px" : "200px",
+                  height: getImageHeight(),
                   width: "100%",
-                  background: `linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "4rem",
                   position: "relative",
                   overflow: "hidden",
+                  backgroundColor: '#f0f0f0',
                 }}
               >
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    background: `linear-gradient(135deg, ${
-                      service.category === "beauty" ? "#ffd6e7" : "#ffecb3"
-                    } 0%, ${
-                      service.category === "beauty" ? "#ffafcc" : "#ffd54f"
-                    } 100%)`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "3.5rem",
-                  }}
-                >
-                  {service.category === "beauty" ? "💄" : "💎"}
-                </div>
+                {renderImage(service.image, service.alt, service.category)}
                 
                 {/* Category Badge */}
                 <div
@@ -326,13 +458,14 @@ const Home = () => {
                     position: "absolute",
                     top: "12px",
                     right: "12px",
-                    padding: "0.4rem 0.8rem",
+                    padding: getResponsiveValue({ xs: "0.3rem 0.6rem", sm: "0.35rem 0.7rem", md: "0.4rem 0.8rem", lg: "0.4rem 0.8rem" }),
                     borderRadius: "20px",
                     background: service.category === "beauty" ? "rgba(232, 67, 147, 0.9)" : "rgba(255, 193, 7, 0.9)",
                     color: "white",
-                    fontSize: "0.75rem",
+                    fontSize: getResponsiveValue({ xs: "0.65rem", sm: "0.7rem", md: "0.75rem", lg: "0.8rem" }),
                     fontWeight: "600",
                     backdropFilter: "blur(10px)",
+                    zIndex: 2,
                   }}
                 >
                   {service.category === "beauty" ? "Beauty" : "Jewelry"}
@@ -341,26 +474,27 @@ const Home = () => {
 
               {/* Service Content */}
               <div style={{ 
-                padding: window.innerWidth < 768 ? "1rem" : "1.5rem", 
+                padding: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "1.8rem" }), 
                 flex: 1, 
                 display: "flex", 
                 flexDirection: "column" 
               }}>
                 <h3 style={{ 
-                  fontSize: window.innerWidth < 768 ? "1.2rem" : "1.4rem", 
+                  fontSize: getResponsiveValue({ xs: "1.1rem", sm: "1.2rem", md: "1.3rem", lg: "1.5rem" }), 
                   marginBottom: "0.8rem", 
                   color: "#333",
-                  fontWeight: "600"
+                  fontWeight: "600",
+                  lineHeight: 1.3
                 }}>
                   {service.title}
                 </h3>
                 
                 <p style={{ 
-                  fontSize: window.innerWidth < 768 ? "0.9rem" : "0.95rem", 
+                  fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1rem" }), 
                   color: "#666", 
-                  marginBottom: "1.2rem", 
+                  marginBottom: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.3rem", lg: "1.5rem" }), 
                   flex: 1,
-                  lineHeight: "1.5"
+                  lineHeight: 1.6
                 }}>
                   {service.description}
                 </p>
@@ -369,14 +503,14 @@ const Home = () => {
                   display: "flex", 
                   justifyContent: "space-between", 
                   alignItems: "center",
-                  marginBottom: "1rem",
-                  flexDirection: window.innerWidth < 480 ? "column" : "row",
-                  alignItems: window.innerWidth < 480 ? "flex-start" : "center",
-                  gap: window.innerWidth < 480 ? "0.5rem" : "0"
+                  marginBottom: getResponsiveValue({ xs: "0.8rem", sm: "1rem", md: "1.1rem", lg: "1.2rem" }),
+                  flexDirection: windowWidth < 480 ? "column" : "row",
+                  alignItems: windowWidth < 480 ? "flex-start" : "center",
+                  gap: windowWidth < 480 ? "0.5rem" : "0"
                 }}>
                   <span
                     style={{
-                      fontSize: window.innerWidth < 768 ? "1.2rem" : "1.3rem",
+                      fontSize: getResponsiveValue({ xs: "1.1rem", sm: "1.2rem", md: "1.3rem", lg: "1.4rem" }),
                       fontWeight: "bold",
                       color: "var(--primary-green)",
                     }}
@@ -386,24 +520,13 @@ const Home = () => {
                   
                   {service.duration && (
                     <div style={{ 
-                      fontSize: window.innerWidth < 768 ? "0.8rem" : "0.85rem", 
+                      fontSize: getResponsiveValue({ xs: "0.75rem", sm: "0.8rem", md: "0.85rem", lg: "0.9rem" }), 
                       color: "#666", 
                       display: "flex", 
                       alignItems: "center", 
-                      gap: "0.3rem" 
+                      gap: "0.4rem" 
                     }}>
                       ⏱️ {service.duration}
-                    </div>
-                  )}
-                  {service.material && (
-                    <div style={{ 
-                      fontSize: window.innerWidth < 768 ? "0.8rem" : "0.85rem", 
-                      color: "#666", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      gap: "0.3rem" 
-                    }}>
-                      💎 {service.material}
                     </div>
                   )}
                 </div>
@@ -415,7 +538,7 @@ const Home = () => {
                   <button
                     style={{
                       width: "100%",
-                      padding: "0.8rem",
+                      padding: getResponsiveValue({ xs: "0.8rem", sm: "0.85rem", md: "0.9rem", lg: "1rem" }),
                       borderRadius: "12px",
                       border: "none",
                       background: service.category === "beauty" ? 
@@ -425,16 +548,16 @@ const Home = () => {
                       fontWeight: "600",
                       cursor: "pointer",
                       transition: "all 0.3s ease",
-                      fontSize: window.innerWidth < 768 ? "0.85rem" : "0.9rem",
+                      fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1rem" }),
                     }}
                     onMouseEnter={(e) => {
-                      if (window.innerWidth > 768) {
+                      if (windowWidth > 768) {
                         e.target.style.transform = "translateY(-2px)";
                         e.target.style.boxShadow = "0 5px 15px rgba(0,0,0,0.2)";
                       }
                     }}
                     onMouseLeave={(e) => {
-                      if (window.innerWidth > 768) {
+                      if (windowWidth > 768) {
                         e.target.style.transform = "translateY(0)";
                         e.target.style.boxShadow = "none";
                       }
@@ -451,16 +574,16 @@ const Home = () => {
         {/* View More Buttons */}
         <div style={{ 
           display: "flex", 
-          gap: "1rem", 
+          gap: getResponsiveValue({ xs: "0.8rem", sm: "0.9rem", md: "1rem", lg: "1rem" }), 
           justifyContent: "center",
           flexWrap: "wrap",
-          flexDirection: window.innerWidth < 768 ? "column" : "row",
-          alignItems: window.innerWidth < 768 ? "center" : "stretch"
+          flexDirection: windowWidth < 768 ? "column" : "row",
+          alignItems: windowWidth < 768 ? "center" : "stretch"
         }}>
-          <Link to="/services" style={{ textDecoration: "none", width: window.innerWidth < 768 ? "100%" : "auto", maxWidth: "300px" }}>
+          <Link to="/services" style={{ textDecoration: "none", width: windowWidth < 768 ? "100%" : "auto", maxWidth: "300px" }}>
             <button
               style={{
-                padding: window.innerWidth < 768 ? "0.8rem 1.5rem" : "1rem 2rem",
+                padding: getResponsiveValue({ xs: "0.8rem 1.5rem", sm: "0.9rem 1.8rem", md: "1rem 2rem", lg: "1.2rem 2.5rem" }),
                 borderRadius: "50px",
                 border: "2px solid #e84393",
                 background: "white",
@@ -468,7 +591,7 @@ const Home = () => {
                 fontWeight: "600",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
-                fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem",
+                fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1.1rem" }),
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -476,14 +599,14 @@ const Home = () => {
                 width: "100%",
               }}
               onMouseEnter={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.target.style.background = "#e84393";
                   e.target.style.color = "white";
                   e.target.style.transform = "translateY(-2px)";
                 }
               }}
               onMouseLeave={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.target.style.background = "white";
                   e.target.style.color = "#e84393";
                   e.target.style.transform = "translateY(0)";
@@ -494,10 +617,10 @@ const Home = () => {
             </button>
           </Link>
           
-          <Link to="/store" style={{ textDecoration: "none", width: window.innerWidth < 768 ? "100%" : "auto", maxWidth: "300px" }}>
+          <Link to="/store" style={{ textDecoration: "none", width: windowWidth < 768 ? "100%" : "auto", maxWidth: "300px" }}>
             <button
               style={{
-                padding: window.innerWidth < 768 ? "0.8rem 1.5rem" : "1rem 2rem",
+                padding: getResponsiveValue({ xs: "0.8rem 1.5rem", sm: "0.9rem 1.8rem", md: "1rem 2rem", lg: "1.2rem 2.5rem" }),
                 borderRadius: "50px",
                 border: "2px solid #FFD700",
                 background: "white",
@@ -505,7 +628,7 @@ const Home = () => {
                 fontWeight: "600",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
-                fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem",
+                fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1.1rem" }),
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -513,14 +636,14 @@ const Home = () => {
                 width: "100%",
               }}
               onMouseEnter={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.target.style.background = "linear-gradient(135deg, #FFD700, #FF8C00)";
                   e.target.style.color = "white";
                   e.target.style.transform = "translateY(-2px)";
                 }
               }}
               onMouseLeave={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.target.style.background = "white";
                   e.target.style.color = "#FF8C00";
                   e.target.style.transform = "translateY(0)";
@@ -534,16 +657,16 @@ const Home = () => {
       </section>
 
       {/* Beauty Parlour Interior Section */}
-      <section className="card">
-        <div style={{ textAlign: "center", marginBottom: window.innerWidth < 768 ? "1.5rem" : "2rem" }}>
+      <section className="card" style={{ padding: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem" }) }}>
+        <div style={{ textAlign: "center", marginBottom: getResponsiveValue({ xs: "1.2rem", sm: "1.5rem", md: "1.8rem", lg: "2rem" }) }}>
           <h2 style={{ 
-            fontSize: window.innerWidth < 768 ? "1.7rem" : window.innerWidth < 480 ? "1.5rem" : "2rem", 
+            fontSize: getResponsiveValue({ xs: "1.4rem", sm: "1.6rem", md: "1.8rem", lg: "2rem" }), 
             marginBottom: "0.5rem" 
           }}>
             Our Beautiful Parlour Interior
           </h2>
           <p style={{ 
-            fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem", 
+            fontSize: getResponsiveValue({ xs: "0.8rem", sm: "0.85rem", md: "0.9rem", lg: "1rem" }), 
             opacity: 0.8, 
             maxWidth: "600px", 
             margin: "0 auto" 
@@ -556,8 +679,8 @@ const Home = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: window.innerWidth < 768 ? "1fr" : "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: window.innerWidth < 768 ? "1rem" : "2rem",
+            gridTemplateColumns: getInteriorGridColumns(),
+            gap: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem" }),
             marginBottom: "3rem",
           }}
         >
@@ -577,47 +700,29 @@ const Home = () => {
                 overflow: "hidden",
               }}
               onMouseEnter={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.currentTarget.style.transform = "translateY(-8px)";
                   e.currentTarget.style.boxShadow = "0 15px 35px rgba(0,0,0,0.15)";
                 }
               }}
               onMouseLeave={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "none";
                 }
               }}
             >
-              {/* Interior Image Placeholder */}
+              {/* Interior Image */}
               <div
                 style={{
-                  height: "200px",
+                  height: getResponsiveValue({ xs: "200px", sm: "220px", md: "240px", lg: "250px" }),
                   width: "100%",
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "4rem",
                   position: "relative",
                   overflow: "hidden",
+                  backgroundColor: '#f0f0f0',
                 }}
               >
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    background: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "2.5rem",
-                    color: "white",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {interior.area.split(' ')[0]}
-                </div>
+                {renderImage(interior.image, interior.title, interior.area)}
                 
                 {/* Area Badge */}
                 <div
@@ -625,13 +730,14 @@ const Home = () => {
                     position: "absolute",
                     top: "12px",
                     left: "12px",
-                    padding: "0.4rem 0.8rem",
+                    padding: getResponsiveValue({ xs: "0.3rem 0.6rem", sm: "0.35rem 0.7rem", md: "0.4rem 0.8rem", lg: "0.4rem 0.8rem" }),
                     borderRadius: "20px",
                     background: "rgba(255, 255, 255, 0.9)",
                     color: "#333",
-                    fontSize: "0.75rem",
+                    fontSize: getResponsiveValue({ xs: "0.65rem", sm: "0.7rem", md: "0.75rem", lg: "0.8rem" }),
                     fontWeight: "600",
                     backdropFilter: "blur(10px)",
+                    zIndex: 2,
                   }}
                 >
                   {interior.area}
@@ -640,13 +746,13 @@ const Home = () => {
 
               {/* Interior Content */}
               <div style={{ 
-                padding: window.innerWidth < 768 ? "1rem" : "1.5rem", 
+                padding: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "1.8rem" }), 
                 flex: 1, 
                 display: "flex", 
                 flexDirection: "column" 
               }}>
                 <h3 style={{ 
-                  fontSize: window.innerWidth < 768 ? "1.2rem" : "1.4rem", 
+                  fontSize: getResponsiveValue({ xs: "1.1rem", sm: "1.2rem", md: "1.3rem", lg: "1.5rem" }), 
                   marginBottom: "0.8rem", 
                   color: "#333",
                   fontWeight: "600"
@@ -655,11 +761,11 @@ const Home = () => {
                 </h3>
                 
                 <p style={{ 
-                  fontSize: window.innerWidth < 768 ? "0.9rem" : "0.95rem", 
+                  fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1rem" }), 
                   color: "#666", 
-                  marginBottom: "1.2rem", 
+                  marginBottom: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.3rem", lg: "1.5rem" }), 
                   flex: 1,
-                  lineHeight: "1.5"
+                  lineHeight: 1.6
                 }}>
                   {interior.description}
                 </p>
@@ -671,7 +777,7 @@ const Home = () => {
                   marginTop: "auto"
                 }}>
                   <div style={{ 
-                    fontSize: window.innerWidth < 768 ? "0.8rem" : "0.85rem", 
+                    fontSize: getResponsiveValue({ xs: "0.75rem", sm: "0.8rem", md: "0.85rem", lg: "0.9rem" }), 
                     color: "#666", 
                     display: "flex", 
                     alignItems: "center", 
@@ -680,7 +786,7 @@ const Home = () => {
                     🏢 Premium Facility
                   </div>
                   <div style={{ 
-                    fontSize: window.innerWidth < 768 ? "0.8rem" : "0.85rem", 
+                    fontSize: getResponsiveValue({ xs: "0.75rem", sm: "0.8rem", md: "0.85rem", lg: "0.9rem" }), 
                     color: "#666", 
                     display: "flex", 
                     alignItems: "center", 
@@ -697,20 +803,20 @@ const Home = () => {
         {/* Visit Us CTA */}
         <div style={{ 
           textAlign: "center",
-          padding: window.innerWidth < 768 ? "1.5rem" : "2rem",
+          padding: getResponsiveValue({ xs: "1.2rem", sm: "1.5rem", md: "1.8rem", lg: "2.5rem" }),
           background: "linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)",
           borderRadius: "20px",
           border: "1px solid #e0e0e0"
         }}>
           <h3 style={{ 
-            fontSize: window.innerWidth < 768 ? "1.2rem" : "1.5rem", 
+            fontSize: getResponsiveValue({ xs: "1.1rem", sm: "1.2rem", md: "1.3rem", lg: "1.6rem" }), 
             marginBottom: "1rem", 
             color: "#333" 
           }}>
             Ready to Experience Our Beautiful Space?
           </h3>
           <p style={{ 
-            fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem", 
+            fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1.1rem" }), 
             color: "#666", 
             marginBottom: "1.5rem", 
             maxWidth: "500px", 
@@ -721,7 +827,7 @@ const Home = () => {
           <Link to="/booking" style={{ textDecoration: "none" }}>
             <button
               style={{
-                padding: window.innerWidth < 768 ? "0.8rem 2rem" : "1rem 2.5rem",
+                padding: getResponsiveValue({ xs: "0.8rem 1.8rem", sm: "0.9rem 2rem", md: "1rem 2.2rem", lg: "1.2rem 3rem" }),
                 borderRadius: "50px",
                 border: "none",
                 background: "linear-gradient(135deg, #e84393, #fd79a8)",
@@ -729,19 +835,19 @@ const Home = () => {
                 fontWeight: "600",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
-                fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem",
+                fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1.1rem" }),
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
               }}
               onMouseEnter={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.target.style.transform = "translateY(-2px)";
                   e.target.style.boxShadow = "0 8px 25px rgba(232, 67, 147, 0.4)";
                 }
               }}
               onMouseLeave={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.target.style.transform = "translateY(0)";
                   e.target.style.boxShadow = "none";
                 }
@@ -754,16 +860,16 @@ const Home = () => {
       </section>
 
       {/* Best Works Section */}
-      <section className="card">
-        <div style={{ textAlign: "center", marginBottom: window.innerWidth < 768 ? "1.5rem" : "2rem" }}>
+      <section className="card" style={{ padding: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem" }) }}>
+        <div style={{ textAlign: "center", marginBottom: getResponsiveValue({ xs: "1.2rem", sm: "1.5rem", md: "1.8rem", lg: "2rem" }) }}>
           <h2 style={{ 
-            fontSize: window.innerWidth < 768 ? "1.7rem" : window.innerWidth < 480 ? "1.5rem" : "2rem", 
+            fontSize: getResponsiveValue({ xs: "1.4rem", sm: "1.6rem", md: "1.8rem", lg: "2rem" }), 
             marginBottom: "0.5rem" 
           }}>
             Our Best Works
           </h2>
           <p style={{ 
-            fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem", 
+            fontSize: getResponsiveValue({ xs: "0.8rem", sm: "0.85rem", md: "0.9rem", lg: "1rem" }), 
             opacity: 0.8, 
             maxWidth: "600px", 
             margin: "0 auto" 
@@ -776,8 +882,8 @@ const Home = () => {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: window.innerWidth < 768 ? "1fr" : window.innerWidth < 1024 ? "repeat(2, 1fr)" : "repeat(3, 1fr)",
-            gap: window.innerWidth < 768 ? "1rem" : "2rem",
+            gridTemplateColumns: getBestWorksGridColumns(),
+            gap: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "2rem" }),
             marginBottom: "3rem",
           }}
         >
@@ -797,61 +903,29 @@ const Home = () => {
                 overflow: "hidden",
               }}
               onMouseEnter={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.currentTarget.style.transform = "translateY(-8px)";
                   e.currentTarget.style.boxShadow = "0 15px 35px rgba(0,0,0,0.15)";
                 }
               }}
               onMouseLeave={(e) => {
-                if (window.innerWidth > 768) {
+                if (windowWidth > 768) {
                   e.currentTarget.style.transform = "translateY(0)";
                   e.currentTarget.style.boxShadow = "none";
                 }
               }}
             >
-              {/* Work Image Placeholder */}
+              {/* Work Image */}
               <div
                 style={{
-                  height: "250px",
+                  height: getResponsiveValue({ xs: "220px", sm: "240px", md: "260px", lg: "280px" }),
                   width: "100%",
-                  background: work.category === "Jewelry" 
-                    ? "linear-gradient(135deg, #FFD700, #FFA500)"
-                    : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "4rem",
                   position: "relative",
                   overflow: "hidden",
+                  backgroundColor: '#f0f0f0',
                 }}
               >
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    background: work.category === "Jewelry" 
-                      ? "linear-gradient(135deg, #FFECB3, #FFD54F)"
-                      : "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: work.beforeAfter ? "2rem" : "3rem",
-                    color: work.category === "Jewelry" ? "#FF8C00" : "white",
-                    fontWeight: "bold",
-                    flexDirection: work.beforeAfter ? "column" : "row",
-                    gap: work.beforeAfter ? "0.5rem" : "0",
-                  }}
-                >
-                  {work.beforeAfter ? (
-                    <>
-                      <div>Before</div>
-                      <div style={{ fontSize: "1.5rem" }}>→</div>
-                      <div>After</div>
-                    </>
-                  ) : (
-                    work.category === "Jewelry" ? "💎✨" : "✨🌟"
-                  )}
-                </div>
+                {renderImage(work.image, work.title, work.category, work.beforeAfter)}
                 
                 {/* Category Badge */}
                 <div
@@ -859,13 +933,14 @@ const Home = () => {
                     position: "absolute",
                     top: "12px",
                     left: "12px",
-                    padding: "0.4rem 0.8rem",
+                    padding: getResponsiveValue({ xs: "0.3rem 0.6rem", sm: "0.35rem 0.7rem", md: "0.4rem 0.8rem", lg: "0.4rem 0.8rem" }),
                     borderRadius: "20px",
                     background: "rgba(255, 255, 255, 0.9)",
                     color: "#333",
-                    fontSize: "0.75rem",
+                    fontSize: getResponsiveValue({ xs: "0.65rem", sm: "0.7rem", md: "0.75rem", lg: "0.8rem" }),
                     fontWeight: "600",
                     backdropFilter: "blur(10px)",
+                    zIndex: 2,
                   }}
                 >
                   {work.category}
@@ -878,13 +953,14 @@ const Home = () => {
                       position: "absolute",
                       top: "12px",
                       right: "12px",
-                      padding: "0.4rem 0.8rem",
+                      padding: getResponsiveValue({ xs: "0.3rem 0.6rem", sm: "0.35rem 0.7rem", md: "0.4rem 0.8rem", lg: "0.4rem 0.8rem" }),
                       borderRadius: "20px",
                       background: "rgba(232, 67, 147, 0.9)",
                       color: "white",
-                      fontSize: "0.75rem",
+                      fontSize: getResponsiveValue({ xs: "0.65rem", sm: "0.7rem", md: "0.75rem", lg: "0.8rem" }),
                       fontWeight: "600",
                       backdropFilter: "blur(10px)",
+                      zIndex: 2,
                     }}
                   >
                     Transformation
@@ -894,13 +970,13 @@ const Home = () => {
 
               {/* Work Content */}
               <div style={{ 
-                padding: window.innerWidth < 768 ? "1rem" : "1.5rem", 
+                padding: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.5rem", lg: "1.8rem" }), 
                 flex: 1, 
                 display: "flex", 
                 flexDirection: "column" 
               }}>
                 <h3 style={{ 
-                  fontSize: window.innerWidth < 768 ? "1.2rem" : "1.4rem", 
+                  fontSize: getResponsiveValue({ xs: "1.1rem", sm: "1.2rem", md: "1.3rem", lg: "1.5rem" }), 
                   marginBottom: "0.8rem", 
                   color: "#333",
                   fontWeight: "600"
@@ -909,11 +985,11 @@ const Home = () => {
                 </h3>
                 
                 <p style={{ 
-                  fontSize: window.innerWidth < 768 ? "0.9rem" : "0.95rem", 
+                  fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1rem" }), 
                   color: "#666", 
-                  marginBottom: "1.2rem", 
+                  marginBottom: getResponsiveValue({ xs: "1rem", sm: "1.2rem", md: "1.3rem", lg: "1.5rem" }), 
                   flex: 1,
-                  lineHeight: "1.5"
+                  lineHeight: 1.6
                 }}>
                   {work.description}
                 </p>
@@ -925,7 +1001,7 @@ const Home = () => {
                   marginTop: "auto"
                 }}>
                   <div style={{ 
-                    fontSize: window.innerWidth < 768 ? "0.8rem" : "0.85rem", 
+                    fontSize: getResponsiveValue({ xs: "0.75rem", sm: "0.8rem", md: "0.85rem", lg: "0.9rem" }), 
                     color: "#666", 
                     display: "flex", 
                     alignItems: "center", 
@@ -934,7 +1010,7 @@ const Home = () => {
                     ⭐ Client Favorite
                   </div>
                   <div style={{ 
-                    fontSize: window.innerWidth < 768 ? "0.8rem" : "0.85rem", 
+                    fontSize: getResponsiveValue({ xs: "0.75rem", sm: "0.8rem", md: "0.85rem", lg: "0.9rem" }), 
                     color: "#666", 
                     display: "flex", 
                     alignItems: "center", 
@@ -951,19 +1027,19 @@ const Home = () => {
         {/* Portfolio CTA */}
         <div style={{ 
           textAlign: "center",
-          padding: window.innerWidth < 768 ? "1.5rem" : "2rem",
+          padding: getResponsiveValue({ xs: "1.2rem", sm: "1.5rem", md: "1.8rem", lg: "2.5rem" }),
           background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
           borderRadius: "20px",
           color: "white"
         }}>
           <h3 style={{ 
-            fontSize: window.innerWidth < 768 ? "1.2rem" : "1.5rem", 
+            fontSize: getResponsiveValue({ xs: "1.1rem", sm: "1.2rem", md: "1.3rem", lg: "1.6rem" }), 
             marginBottom: "1rem" 
           }}>
             Want to See More of Our Work?
           </h3>
           <p style={{ 
-            fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem", 
+            fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1.1rem" }), 
             marginBottom: "1.5rem", 
             maxWidth: "500px", 
             margin: "0 auto", 
@@ -974,7 +1050,7 @@ const Home = () => {
           <button
             onClick={() => window.open('https://www.instagram.com/missamma_beautyparlour', '_blank')}
             style={{
-              padding: window.innerWidth < 768 ? "0.8rem 2rem" : "1rem 2.5rem",
+              padding: getResponsiveValue({ xs: "0.8rem 1.8rem", sm: "0.9rem 2rem", md: "1rem 2.2rem", lg: "1.2rem 3rem" }),
               borderRadius: "50px",
               border: "2px solid white",
               background: "transparent",
@@ -982,20 +1058,20 @@ const Home = () => {
               fontWeight: "600",
               cursor: "pointer",
               transition: "all 0.3s ease",
-              fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem",
+              fontSize: getResponsiveValue({ xs: "0.85rem", sm: "0.9rem", md: "0.95rem", lg: "1.1rem" }),
               display: "inline-flex",
               alignItems: "center",
               gap: "0.5rem",
             }}
             onMouseEnter={(e) => {
-              if (window.innerWidth > 768) {
+              if (windowWidth > 768) {
                 e.target.style.background = "white";
                 e.target.style.color = "#667eea";
                 e.target.style.transform = "translateY(-2px)";
               }
             }}
             onMouseLeave={(e) => {
-              if (window.innerWidth > 768) {
+              if (windowWidth > 768) {
                 e.target.style.background = "transparent";
                 e.target.style.color = "white";
                 e.target.style.transform = "translateY(0)";
