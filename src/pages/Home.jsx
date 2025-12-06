@@ -13,6 +13,7 @@ import necklaceSetImg from "../assets/necklace-set.jpg";
 import realearringImg from "../assets/real-Ear-rings.png";
 import hairtransformationImg from "../assets/hair-transformation.jpeg";
 import makeuptransformationImg from "../assets/makeup-transformation.png";
+
 const Home = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
@@ -502,10 +503,9 @@ const Home = () => {
                 <div style={{ 
                   display: "flex", 
                   justifyContent: "space-between", 
-                  alignItems: "center",
+                  alignItems: windowWidth < 480 ? "flex-start" : "center", // FIXED: Removed duplicate alignItems
                   marginBottom: getResponsiveValue({ xs: "0.8rem", sm: "1rem", md: "1.1rem", lg: "1.2rem" }),
                   flexDirection: windowWidth < 480 ? "column" : "row",
-                  alignItems: windowWidth < 480 ? "flex-start" : "center",
                   gap: windowWidth < 480 ? "0.5rem" : "0"
                 }}>
                   <span

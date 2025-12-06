@@ -75,10 +75,9 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div style={{ 
-          display: "flex", 
           gap: "1.6rem", 
           fontSize: "0.9rem",
-          display: window.innerWidth < 768 ? "none" : "flex"
+          display: window.innerWidth < 768 ? "none" : "flex"  // Fixed: removed duplicate display property
         }}>
           {navItems.map((item) => (
             <Link
